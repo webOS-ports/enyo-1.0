@@ -2680,7 +2680,7 @@ return this.ctor.publishedList = a;
 // compatibility/webkitGesture.js
 
 enyo.requiresWindow(function() {
-window.PalmSystem || (enyo.dispatcher.features.push(function(a) {
+(enyo.dispatcher.features.push(function(a) {
 enyo.iphoneGesture[a.type] && enyo.iphoneGesture[a.type](a);
 }), enyo.iphoneGesture = {
 _send: function(a, b) {
