@@ -14,7 +14,7 @@ b = !0;
 var d = enyo.path.paths[c];
 return d ? d.charAt(d.length - 1) == "/" ? d : d + "/" : "";
 };
-do b = !1, c = c.replace(this.pattern, d); while (b);
+do b = !1, c = c ? c.replace(this.pattern, d) : ""; while (b);
 return c;
 },
 paths: {

@@ -20,7 +20,7 @@
 			};
 			do {
 				working = false;
-				result = result.replace(this.pattern, fn);
+				result = result ? result.replace(this.pattern, fn) : "";
 			} while (working);
 			return result;
 		},
