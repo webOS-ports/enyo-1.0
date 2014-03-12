@@ -2018,7 +2018,7 @@ html, body, input, button {
 
 .enyo-group {
 	border-width: 14px 14px 14px 14px;
-	-webkit-border-image: url(palm/themes/Onyx/images/group-unlabeled.png) 14 14 repeat repeat;
+	-webkit-border-image: url(palm/themes/Onyx/images/group-unlabeled.png) 14 14;
 	margin: 8px 3px;
 }
 
@@ -2032,7 +2032,7 @@ html, body, input, button {
 
 .enyo-group.labeled {
 	border-width: 36px 14px 14px 14px;
-	-webkit-border-image: url(palm/themes/Onyx/images/group-labeled.png) 36 14 14 14 repeat repeat;
+	-webkit-border-image: url(palm/themes/Onyx/images/group-labeled.png) 36 14 14 14;
 	margin: 8px 3px;
 }
 
