@@ -2697,7 +2697,7 @@ touchmove: function(a) {
 this._send("mousemove", a.changedTouches[0]);
 },
 touchend: function(a) {
-this._send("mouseup", a.changedTouches[0]), this._send("click", a.changedTouches[0]);
+this._send("mouseup", a.changedTouches[0]); // this._send("click", a.changedTouches[0]);
 },
 connect: function() {
 document.ontouchstart = enyo.dispatch, document.ontouchmove = enyo.dispatch, document.ontouchend = enyo.dispatch;
