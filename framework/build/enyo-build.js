@@ -2707,6 +2707,7 @@ document.ontouchstart = enyo.dispatch, document.ontouchmove = enyo.dispatch, doc
 
 // compatibility/webosGesture.js
 
+/*
 window.PalmSystem && (enyo.dispatcher.features.push(function(a) {
 enyo.webosGesture[a.type] && enyo.webosGesture[a.type](a);
 }), enyo.webosGesture = {
@@ -2721,7 +2722,10 @@ target: enyo.webosGesture.lastDownTarget
 enyo.dispatch(c);
 }, Mojo.screenOrientationChanged = function() {}, enyo.requiresWindow(function() {
 document.addEventListener("gesturestart", enyo.dispatch), document.addEventListener("gesturechange", enyo.dispatch), document.addEventListener("gestureend", enyo.dispatch);
-})), typeof webosEvent == "undefined" && (webosEvent = {
+}));
+*/
+
+typeof webosEvent == "undefined" && (webosEvent = {
 event: enyo.nop,
 start: enyo.nop,
 stop: enyo.nop

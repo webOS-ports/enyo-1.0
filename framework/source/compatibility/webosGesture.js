@@ -1,4 +1,5 @@
 //* @protected
+/*
 if (window.PalmSystem) {
 	// add webOS-specific gesture features
 	enyo.dispatcher.features.push(
@@ -37,6 +38,7 @@ if (window.PalmSystem) {
 		document.addEventListener("gestureend", enyo.dispatch);
 	});
 }
+*/
 
 // window.webosEvent apparently not present on <= webOS 2.1; also needed for non-PalmSystem environments
 if (typeof(webosEvent) === "undefined") {
