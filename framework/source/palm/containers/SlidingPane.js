@@ -33,7 +33,7 @@ enyo.kind({
 	kind: enyo.Pane,
 	published: {
 		multiView: true,
-		multiViewMinWidth: 500,
+		multiViewMinWidth: 900,
 		canAnimate: true,
 		dismissDistance: 100
 	},

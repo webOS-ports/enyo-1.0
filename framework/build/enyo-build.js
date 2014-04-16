@@ -10878,7 +10878,7 @@ name: "enyo.SlidingPane",
 kind: enyo.Pane,
 published: {
 multiView: !0,
-multiViewMinWidth: 500,
+multiViewMinWidth: 900,
 canAnimate: !0,
 dismissDistance: 100
 },
