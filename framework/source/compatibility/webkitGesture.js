@@ -39,7 +39,7 @@ enyo.requiresWindow(function() {
 		},
 		touchend: function(e) {
 			this._send("mouseup", e.changedTouches[0]);
-			// this._send("click", e.changedTouches[0]); 
+			this._send("click", e.changedTouches[0]); 
 		},
 		connect: function() {
 			document.ontouchstart = enyo.dispatch; 
