@@ -6218,7 +6218,9 @@ var a = window.opener || window.rootWindow || window.top || window;
 return a.setTimeout || (a = window), a;
 },
 getWindows: function() {
-var a = this.getRootWindow(), b = a.enyo.windows.manager, c = b._windowList, d = {};
+var a = this.getRootWindow();
+if (typeof(a) === "undefined" || typeof(a.enyo) === "undefined" || typeof(a.enyo.windows) === "undefined" || typeof(a.enyo.windows.manager) === "undefined") return [];
+b = a.enyo.windows.manager, c = b._windowList, d = {};
 for (var e in c) this.isValidWindow(c[e]) && (d[e] = c[e]);
 return b._windowList = d, d;
 },
