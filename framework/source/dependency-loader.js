@@ -4,7 +4,7 @@
 	};
 
 	enyo.script = function(s) {
-		document.write('<script src="' + s + '" type="text/javascript" onerror="console.error(\'Error loading script ' + s + '\')"></script>');
+		document.write('<script src="' + s + '" type="text/javascript" charset="utf-8" onerror="console.error(\'Error loading script ' + s + '\')"></script>');
 	}
 
 	enyo.path = {

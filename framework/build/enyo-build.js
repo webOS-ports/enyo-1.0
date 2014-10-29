@@ -5,7 +5,7 @@
 enyo.sheet = function(a) {
 document.write('<link href="' + a + '" media="screen" rel="stylesheet" type="text/css" />');
 }, enyo.script = function(a) {
-document.write('<script src="' + a + '" type="text/javascript" onerror="console.error(\'Error loading script ' + a + "')\"></script>");
+document.write('<script src="' + a + '" type="text/javascript" charset="utf-8" onerror="console.error(\'Error loading script ' + a + "')\"></script>");
 }, enyo.path = {
 pattern: /\$([^\/\\]*)(\/)?/g,
 rewrite: function(a) {
