@@ -45,7 +45,7 @@ enyo.kind({
 	dismissWithClick:false,
 	modal:true,
 	scrim:true,
-	filePickerPath: "/usr/lib/luna/system/luna-systemui/app/FilePicker/filepicker.html",
+	filePickerPath: "/usr/palm/applications/com.palm.systemui/app/FilePicker/filepicker.html",
 	components: [
 		{className: "enyo-filepicker-container", components: [
 			{name: 'crossapp', kind:"CrossAppUI", onResult: "handleResult"}

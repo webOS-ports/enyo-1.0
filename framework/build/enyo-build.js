@@ -6495,7 +6495,7 @@ onPickFile: ""
 dismissWithClick: !1,
 modal: !0,
 scrim: !0,
-filePickerPath: "/usr/lib/luna/system/luna-systemui/app/FilePicker/filepicker.html",
+filePickerPath: "/usr/palm/applications/com.palm.systemui/app/FilePicker/filepicker.html",
 components: [ {
 className: "enyo-filepicker-container",
 components: [ {
