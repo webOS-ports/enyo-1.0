@@ -208,13 +208,13 @@ enyo.job.stop = function(inJobName) {
 	// API is non-standard, so what enyo exposes may vary from 
 	// web documentation for various browsers
 	// in particular, requestAnimationFrame takes no arguments, and the callback receives no arguments
-	var builtin = window.webkitRequestAnimationFrame;
+	var builtin = window.requestAnimationFrame;
 	enyo.requestAnimationFrame = builtin ? enyo.bind(window, builtin) :
 		function(inCallback) {
 			return window.setTimeout(inCallback, Math.round(1000/60));
 		};
 	//
-	var builtin = window.webkitCancelRequestAnimationFrame || window.clearTimeout;
+	var builtin = window.cancelRequestAnimationFrame || window.clearTimeout;
 	// API 
 	enyo.cancelRequestAnimationFrame = enyo.bind(window, builtin);
 	//
