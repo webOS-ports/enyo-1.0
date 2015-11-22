@@ -1642,11 +1642,11 @@ enyo.job.stop(a), b();
 }, enyo.job.stop = function(a) {
 enyo.job._jobs[a] && (clearTimeout(enyo.job._jobs[a]), delete enyo.job._jobs[a]);
 }, function() {
-var a = window.webkitRequestAnimationFrame;
+var a = window.RequestAnimationFrame;
 enyo.requestAnimationFrame = a ? enyo.bind(window, a) : function(a) {
 return window.setTimeout(a, Math.round(1e3 / 60));
 };
-var a = window.webkitCancelRequestAnimationFrame || window.clearTimeout;
+var a = window.CancelRequestAnimationFrame || window.clearTimeout;
 enyo.cancelRequestAnimationFrame = enyo.bind(window, a);
 if (a) {
 var b = enyo.requestAnimationFrame(enyo.nop);
