@@ -214,15 +214,15 @@ enyo.job.stop = function(inJobName) {
 			return window.setTimeout(inCallback, Math.round(1000/60));
 		};
 	//
-	var builtin = window.cancelRequestAnimationFrame || window.clearTimeout;
+	var builtin = window.cancelAnimationFrame || window.clearTimeout;
 	// API 
 	enyo.cancelRequestAnimationFrame = enyo.bind(window, builtin);
 	//
 	// Note: (we have requested to change the native implementation to do this)
-	// first return value of webkitRequestAnimationFrame is 0 and a call 
-	// to webkitCancelRequestAnimationFrame with no arguments will cancel this.
+	// first return value of requestAnimationFrame is 0 and a call 
+	// to cancelAnimationFrame with no arguments will cancel this.
 	// To avoid this and to allow for a boolean test of the return value,
-	// make 1 bogus call so the first used return value of webkitRequestAnimationFrame is > 0.
+	// make 1 bogus call so the first used return value of requestAnimationFrame is > 0.
 	// (we choose to do this rather than wrapping the native function to avoid the overhead)
 	if (builtin) {
 		var f = enyo.requestAnimationFrame(enyo.nop);
