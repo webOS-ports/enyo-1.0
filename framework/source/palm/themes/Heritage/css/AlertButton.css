@@ -14,10 +14,12 @@
 .enyo-alert-button {
 	background-color: #c70000;
 	-webkit-border-image: url(../images/alert-button.png) 0 14 111 14 repeat repeat;
+	border-style: solid;
 }
 
 .enyo-alert-button.enyo-button-down {
 	-webkit-border-image: url(../images/alert-button.png) 37 14 74 14 repeat repeat;
+	border-style: solid;
 }
 
 /* undo button (often cancel) */
@@ -25,8 +27,10 @@
 .enyo-alert-button-undo {
 	background-color: white;
 	-webkit-border-image: url(../images/alert-button.png) 74 14 37 14 repeat repeat;
+	border-style: solid;
 }
 
 .enyo-alert-button-undo.enyo-button-down {
 	-webkit-border-image: url(../images/alert-button.png) 111 14 0 14 repeat repeat;
+	border-style: solid;
 }

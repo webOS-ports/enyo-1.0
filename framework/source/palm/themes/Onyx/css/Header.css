@@ -3,6 +3,7 @@
 	-webkit-box-sizing: border-box;
 	min-height: 50px;
 	border-width: 2px 0;
+	border-style: solid;
 	background-color: #ccc;
 	color: #444;
 	/*
@@ -17,6 +18,7 @@
 .enyo-header.enyo-header-dark {
 	-webkit-border-image: url(../images/toolbar.png) 2 4 repeat stretch;
 	border-width: 2px 0;
+	border-style: solid;
 	background-color: #343434;
 	color: #fff;
 }
@@ -24,10 +26,12 @@
 @media (-webkit-min-device-pixel-ratio:1.5) {
 	.enyo-header {
 		-webkit-border-image: url(../images-1.5/header.png) 3 0;
+		border-style: solid;
 	}
 	
 	.enyo-header.enyo-header-dark {
 		-webkit-border-image: url(../images/toolbar.png) 3 6 repeat stretch;
+		border-style: solid;
 	}
 }
 

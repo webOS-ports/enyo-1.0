@@ -23,6 +23,7 @@
 .enyo-slider-progress {
 	height: 10px;
 	border-width: 0px 4px;
+	border-style: solid;
 	-webkit-border-image: url(../images/slider-track.png) 0 4 0 4 repeat repeat;
 	margin: 20px 0px;
 	position:relative;
@@ -40,5 +41,6 @@
 	
 	.enyo-slider-progress {
 		-webkit-border-image: url(../images-1.5/slider-track.png) 0 6 0 6 repeat stretch;
+		border-style: solid;
 	}
 }

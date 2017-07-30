@@ -1,5 +1,6 @@
 .enyo-input.enyo-rounded-input, .enyo-input.enyo-rounded-input.enyo-input-focus {
 	border-width: 6px 20px;
+	border-style: solid;
 	-webkit-box-sizing: border-box;
 	-webkit-border-image: url(../images/roundedbox.png) 6 20;
 	margin: 2px 0;
@@ -14,5 +15,6 @@
 @media (-webkit-min-device-pixel-ratio:1.5) {
 	.enyo-input.enyo-rounded-input, .enyo-input.enyo-rounded-input.enyo-input-focus {
 		-webkit-border-image: url(../images-1.5/roundedbox.png) 9 30;
+		border-style: solid;
 	}
 }

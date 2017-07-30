@@ -34,6 +34,7 @@ FIXME: we almost always want some padding on a enyo-item, except when it's surro
 	padding-bottom: 11px;
 	border-width: 14px 14px 3px 14px;
 	border-image: url(../images/roundy-shadow-top.png) 14 14 3 14;
+	border-style: solid;
 	-webkit-border-image: url(../images/roundy-shadow-top.png) 14 14 3 14;
 	-moz-border-image: url(../images/roundy-shadow-top.png) 14 14 3 14;
 }
@@ -42,6 +43,7 @@ FIXME: we almost always want some padding on a enyo-item, except when it's surro
 	padding-top: 11px;
 	border-width: 3px 14px 14px 14px;
 	border-image: url(../images/roundy-shadow-bottom.png) 3 14 14 14;
+	border-style: solid;
 	-webkit-border-image: url(../images/roundy-shadow-bottom.png) 3 14 14 14;
 	-moz-border-image: url(../images/roundy-shadow-bottom.png) 3 14 14 14;
 }
@@ -49,6 +51,7 @@ FIXME: we almost always want some padding on a enyo-item, except when it's surro
 .rounded.enyo-single > .enyo-flat-shadow {
 	border-width: 14px 14px 14px 14px;
 	border-image: url(../images/roundy-shadow.png) 14 14;
+	border-style: solid;
 	-webkit-border-image: url(../images/roundy-shadow.png) 14 14;
 	-moz-border-image: url(../images/roundy-shadow.png) 14 14;
 }
@@ -58,6 +61,7 @@ FIXME: we almost always want some padding on a enyo-item, except when it's surro
 .enyo-flat-shadow {
 	background-color: transparent;
 	border-width: 14px;
+	border-style: solid;
 	border-image: url(../images/flat-shadow.png) 14 14;
 	-webkit-border-image: url(../images/flat-shadow.png) 14 14;
 	-moz-border-image: url(../images/flat-shadow.png) 14 14;
@@ -67,6 +71,7 @@ FIXME: we almost always want some padding on a enyo-item, except when it's surro
 	background-color: transparent;
 	padding-bottom: 11px;
 	border-width: 14px 14px 3px 14px;
+	border-style: solid;
 	border-image: url(../images/roundy-shadow-top.png) 14 14 3 14;
 	-webkit-border-image: url(../images/roundy-shadow-top.png) 14 14 3 14;
 	-moz-border-image: url(../images/roundy-shadow-top.png) 14 14 3 14;
@@ -80,6 +85,7 @@ FIXME: we almost always want some padding on a enyo-item, except when it's surro
 	background-color: transparent;
 	padding-top: 11px;
 	border-width: 3px 14px 14px 14px;
+	border-style: solid;
 	border-image: url(../images/roundy-shadow-bottom.png) 3 14 14 14;
 	-webkit-border-image: url(../images/roundy-shadow-bottom.png) 3 14 14 14;
 	-moz-border-image: url(../images/roundy-shadow-bottom.png) 3 14 14 14;

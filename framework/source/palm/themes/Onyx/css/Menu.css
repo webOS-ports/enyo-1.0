@@ -1,6 +1,7 @@
 .enyo-popup.enyo-popup-menu {
 	min-width: inherit;
 	border-width: 20px;
+	border-style: solid;
 	-webkit-border-image: url(../images/menu-background.png) 20 20 20 20 stretch stretch;
 	
 	/* FIXME: consider when works more reliably */
@@ -60,6 +61,7 @@
 	}
 	.enyo-popup.enyo-popup-menu {
 		-webkit-border-image: url(../images-1.5/menu-background.png) 30 30 30 30 stretch stretch;
+		border-style: solid;
 	}
 }
 

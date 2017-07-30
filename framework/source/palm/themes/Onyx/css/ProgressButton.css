@@ -2,6 +2,7 @@
 	min-height: 34px;
 	border-width: 4px;
 	border-radius: 5px;
+	border-style: solid;
 	-webkit-border-image: url(../images/button-down.png) 4 4 4 4 stretch stretch;
 	color: white;
 	background-color: rgba(23,23,23,0.5);
@@ -17,6 +18,7 @@
 	bottom: 0;
 	border-width: 4px;
 	border-radius: 5px;
+	border-style: solid;
 	position: absolute;
 	-webkit-border-image: url(../images/button.png) 4 4 4 4 stretch stretch;
 }
@@ -38,10 +40,12 @@
 @media (-webkit-min-device-pixel-ratio:1.5) {
 	.enyo-progress-button {
 		-webkit-border-image: url(../images-1.5/button-down.png) 6 6 6 6 stretch stretch;
+		border-style: solid;
 	}
 	
 	.enyo-progress-button-inner {
 		-webkit-border-image: url(../images-1.5/button.png) 6 6 6 6 stretch stretch;
+		border-style: solid;
 	}
 	
 	.enyo-progress-button-cancel {
