@@ -3,6 +3,7 @@
 	position: fixed;
 	font-size: 18px;
 	border-width: 12px 24px 20px 24px;
+	border-style: solid;
 	-webkit-border-image: url(../images/appmenu.png) 12 24 20 24 stretch stretch;
 	color: white;
 	top: 0px;
@@ -32,5 +33,6 @@
 @media (-webkit-min-device-pixel-ratio:1.5) {
 	.enyo-popup.enyo-appmenu {
 		-webkit-border-image: url(../images-1.5/appmenu.png) 18 36 30 36 stretch stretch;
+		border-style: solid;
 	}
 }

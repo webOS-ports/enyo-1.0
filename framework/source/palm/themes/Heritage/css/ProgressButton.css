@@ -1,6 +1,7 @@
 .enyo-progress-button {
 	height: 50px;
 	border-width: 0px 25px;
+	border-style: solid;
 	-webkit-border-image: url(../images/palm-menu-button.png) 0 25 200 25;
 	-webkit-box-sizing: border-box;
 	color: white;
@@ -11,6 +12,7 @@
 	height: 50px;
 	margin: 0 -25px;
 	border-width: 0 25px;
+	border-style: solid;
 	position: absolute;
 	-webkit-border-image: url(../images/progress-button-inner.png) 0 25 0 25 repeat repeat;
 }

@@ -31,6 +31,7 @@
 
 .enyo-tool-button-client.enyo-tool-button-captioned.enyo-button-down, .enyo-tool-button-client.enyo-button-depressed {
 	-webkit-border-image: url(../images/button-down.png) 4 4 4 4 stretch stretch;
+	border-style: solid;
 }
 
 .enyo-tool-button-client.enyo-button-depressed {
@@ -46,10 +47,12 @@
 @media (-webkit-min-device-pixel-ratio:1.5) {
 	.enyo-tool-button-client.enyo-tool-button-captioned.enyo-button-down, .enyo-tool-button-client.enyo-button-depressed {
 		-webkit-border-image: url(../images-1.5/button-down.png) 6 6 6 6 stretch stretch;
+		border-style: solid;
 	}
 	
 	.enyo-tool-button-client.enyo-tool-button-captioned {
 		-webkit-border-image: url(../images-1.5/button-toolbar.png) 6 6 6 6 stretch stretch;
+		border-style: solid;
 	}
 }
 

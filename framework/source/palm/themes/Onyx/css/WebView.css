@@ -9,4 +9,5 @@
 .enyo-webview-popup-spinner {
 	min-width: 0px;
 	-webkit-border-image: none;
+	border-style: solid;
 }

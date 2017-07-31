@@ -13,6 +13,7 @@
 .enyo-divider-left-cap {
 	min-width: 4px;
 	border-width: 0px;
+	border-style: solid;
 	-webkit-border-image: url(../images/enyo-divider-border.png) 0 6 0 6 repeat repeat;
 }
 

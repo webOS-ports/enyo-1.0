@@ -10,6 +10,7 @@
 	font-size: inherited;
 	border-width: 19px;
 	-webkit-border-image: url(../images/popup-picker.png) 19;
+	border-style: solid;
 }
 
 .enyo-picker-item-selected {

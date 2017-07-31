@@ -1,5 +1,6 @@
 .enyo-group {
 	border-width: 14px 14px 14px 14px;
+	border-style: solid;
 	-webkit-border-image: url(../images/group-unlabeled.png) 14 14;
 	margin: 8px 3px;
 }
@@ -14,6 +15,7 @@
 
 .enyo-group.labeled {
 	border-width: 36px 14px 14px 14px;
+	border-style: solid;
 	-webkit-border-image: url(../images/group-labeled.png) 36 14 14 14;
 	margin: 8px 3px;
 }
@@ -21,9 +23,11 @@
 @media (-webkit-min-device-pixel-ratio:1.5) {
 	.enyo-group {
 		-webkit-border-image: url(../images-1.5/group-unlabeled.png) 21 21 stretch stretch;
+		border-style: solid;
 	}
 	.enyo-group.labeled {
 		-webkit-border-image: url(../images-1.5/group-labeled.png) 54 21 21 21 stretch stretch;
+		border-style: solid;
 	}
 }
 
