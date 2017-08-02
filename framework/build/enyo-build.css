@@ -262,14 +262,14 @@ div, object, img, textarea, iframe {
 	100% { -webkit-transform: rotateZ(359deg);}
 }
 .enyo-rotating-image {
-/*	-webkit-animation-name: enyo-rotating-image-rotate;
+	-webkit-animation-name: enyo-rotating-image-rotate;
 	-webkit-animation-iteration-count: infinite;
 	-webkit-animation-duration: 1s;
-	-webkit-animation-timing-function: linear;*/
+	-webkit-animation-timing-function: linear;
 	overflow: hidden;
 	/*background: -webkit-gradient(linear, left top, left bottom, from(#00ABEB), to(white), color-stop(0.5, white), color-stop(0.5, #6C0));*/
-	background-origin: padding-box;
-	background-clip: content-box;
+	-webkit-background-origin: padding-box;
+	-webkit-background-clip: content-box;
 }
 
 
@@ -2409,31 +2409,17 @@ FIXME: we almost always want some padding on a enyo-item, except when it's surro
 /* palm/themes/Onyx/css/Spinner.css */
 
 .enyo-spinner {
-    /* We'll use the Enyo 2 spinner.gif as workaround instead because the webkit-transform is completely broken it seems. 
     width: 32px;
     height: 32px;
     -webkit-box-sizing: border-box;
-    background-image: url(palm/themes/Onyx/images/spinner.png); */
-    width: 32px;
-    height: 33px;
-    background-image: url(palm/themes/Onyx/images/spinner-light.gif);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
+    background-image: url(palm/themes/Onyx/images/spinner.png); 
 }
 
 .enyo-spinner-large {
-    /* We'll use the Enyo 2 spinner.gif as workaround instead because the webkit-transform is completely broken it seems. 
     width: 128px;
     height: 128px;
     -webkit-box-sizing: border-box;
     background-image: url(palm/themes/Onyx/images/spinner-large.png); */
-    width: 69px;
-    height: 68px;
-    background-image: url(palm/themes/Onyx/images/spinner-light.gif);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
 }
 
 @media (-webkit-min-device-pixel-ratio:1.5) {

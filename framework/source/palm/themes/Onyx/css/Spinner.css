@@ -1,29 +1,15 @@
 .enyo-spinner {
-    /* We'll use the Enyo 2 spinner.gif as workaround instead because the webkit-transform is completely broken it seems. 
     width: 32px;
     height: 32px;
     -webkit-box-sizing: border-box;
-    background-image: url(palm/themes/Onyx/images/spinner.png); */
-    width: 32px;
-    height: 33px;
-    background-image: url(palm/themes/Onyx/images/spinner-light.gif);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
+    background-image: url(../images/spinner.png); 
 }
 
 .enyo-spinner-large {
-    /* We'll use the Enyo 2 spinner.gif as workaround instead because the webkit-transform is completely broken it seems. 
     width: 128px;
     height: 128px;
     -webkit-box-sizing: border-box;
-    background-image: url(palm/themes/Onyx/images/spinner-large.png); */
-    width: 69px;
-    height: 68px;
-    background-image: url(palm/themes/Onyx/images/spinner-light.gif);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
+    background-image: url(../images/spinner-large.png);
 }
 
 @media (-webkit-min-device-pixel-ratio:1.5) {
