@@ -32,9 +32,9 @@ if (window.PalmSystem) {
 
 	enyo.requiresWindow(function() {
 		// add gesture event suppport
-		document.addEventListener("gesturestart", enyo.dispatch);
-		document.addEventListener("gesturechange", enyo.dispatch);
-		document.addEventListener("gestureend", enyo.dispatch);
+		document.addEventListener("touchstart", enyo.dispatch);
+		document.addEventListener("touchmove", enyo.dispatch);
+		document.addEventListener("touchend", enyo.dispatch);
 	});
 }
 
