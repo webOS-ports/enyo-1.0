@@ -2720,7 +2720,7 @@ target: enyo.webosGesture.lastDownTarget
 }, b);
 enyo.dispatch(c);
 }, Mojo.screenOrientationChanged = function() {}, enyo.requiresWindow(function() {
-document.addEventListener("touchstart", enyo.dispatch), document.addEventListener("touchmove", enyo.dispatch), document.addEventListener("touchend", enyo.dispatch);
+document.addEventListener("touchstart", enyo.dispatch, {passive:false}), document.addEventListener("touchmove", enyo.dispatch, {passive:false}), document.addEventListener("touchend", enyo.dispatch, {passive:false});
 })), typeof webosEvent == "undefined" && (webosEvent = {
 event: enyo.nop,
 start: enyo.nop,
