@@ -1,3 +1,4 @@
+/*globals JSON, PalmSystem, console, enyo, window*/
 var AccountsUtil = (function () {
 	var accountsRb = new enyo.g11n.Resources({root: "$enyo-lib/accounts"});
 	
@@ -12,7 +13,8 @@ var AccountsUtil = (function () {
 	// Get the template that matches the given ID.  Template ID's should
 	// be unique so the first match is returned.
 	function getTemplateById(templates, id) {
-		for (var i=0, l=templates.length; i<l; i++) {
+		var i, l=templates.length;
+		for (i=0; i<l; i++) {
 			if (templates[i].templateId === id) {
 				return templates[i];
 			}
@@ -27,7 +29,7 @@ var AccountsUtil = (function () {
 			console.log("matchCapabilities: excluding " + t.templateId + " because it is hidden or doesn't have a validator");
 			return false;
 		}
-		
+		var i, j, l, ll;
 		// Should this template be excluded?
 		if (this.exclude) {
 			// Format the excludes consistently (in an array)
@@ -37,10 +39,10 @@ var AccountsUtil = (function () {
 			} else if (this.capability) {
 				excludes = this.exclude;
 			}
-			for (var i=0, l=excludes.length; i<l; i++) {
-				console.log("matchCapabilities: excluding " + excludes[i] + "?")
+			for (i=0, l=excludes.length; i<l; i++) {
+				console.log("matchCapabilities: excluding " + excludes[i] + "?");
 				if (t.templateId === excludes[i]) {
-					console.log("matchCapabilities: excluding " + t.templateId)
+					console.log("matchCapabilities: excluding " + t.templateId);
 					return false;
 				}
 			}
@@ -59,8 +61,8 @@ var AccountsUtil = (function () {
 		// supported.
 		if (capabilities) {
 			// Loop through the capabilities
-			for (var i=0, l=capabilities.length; i<l; i++) {
-				for (var j=0, ll=t.capabilityProviders.length; j<ll; j++) {
+			for (i=0, l=capabilities.length; i<l; i++) {
+				for (j=0, ll=t.capabilityProviders.length; j<ll; j++) {
 					if (t.capabilityProviders[j].capability === capabilities[i]) {
 						console.log("matchCapabilities: " + t.templateId + " has capability " + capabilities[i]);
 						return true;
@@ -81,30 +83,36 @@ var AccountsUtil = (function () {
 		// Return false if the account's tempate matches the exclusion
 		filterTemplateId: function(account) {
 			// The simplist case - there is just one exclusion
-			if (typeof this.exclude === "string")
+			if (typeof this.exclude === "string"){
 				return account.templateId !== this.exclude;
-				
+			}
 			// The exclusions are an array
-			for (var i=0, l=this.exclude.length; i<l; i++) {
-				if (account.templateId === this.exclude[i])
+			var i, l;
+			for (i=0, l=this.exclude.length; i<l; i++) {
+				if (account.templateId === this.exclude[i]){
 					return false;
+				}
 			}
 			return true;
 		},
 		
 		toArray: function(object) {
-			if (typeof object === "string")
-				return(object);
-			else if (object)
-				return (object);
+			if (typeof object === "string"){
+				return object;
+			}
+			if (object){
+				return object;
+			}
 			return [];
 		},
 		
 		// Iterate through an array of accounts for the one that matches the given accountId
 		getAccount: function(accountArray, accountId) {
-			for (var i=0, l=accountArray.length; i < l; i++) {
-				if (accountArray[i]._id === accountId)
+			var i=0, l=accountArray.length;
+			for (i=0; i < l; i++) {
+				if (accountArray[i]._id === accountId){
 					return accountArray[i];
+				}
 			}
 		},
 
@@ -124,7 +132,7 @@ var AccountsUtil = (function () {
 					console.log("filterTemplates: filterBy.templateId");
 					tmpl = getTemplateById(templates, filterBy.templateId);
 					if (tmpl == undefined) {
-						console.log("filterTemplates: Unable to find template with id=" + filterBy.templateId)
+						console.log("filterTemplates: Unable to find template with id=" + filterBy.templateId);
 						return undefined;
 					}
 					return tmpl;
@@ -133,13 +141,14 @@ var AccountsUtil = (function () {
 				if (filterBy.capability) {
 					// First match templates based on capabilities
 					selectedTemplates = templates.filter(matchCapabilities, filterBy);
-					for (var i=0, l=selectedTemplates.length; i<l; i++)
+					var i, l;
+					for (i=0, l=selectedTemplates.length; i<l; i++){
 						console.log("filterBy.capability match =" + selectedTemplates[i].templateId);
-					
+					}
 					return selectedTemplates;
 				}
 				
-				console.log("filterTemplates: Must specify 'templateId' or 'capability' - no filtering performed!")	
+				console.log("filterTemplates: Must specify 'templateId' or 'capability' - no filtering performed!");
 			}
 			return selectedTemplates;
 		},
@@ -186,16 +195,18 @@ var AccountsUtil = (function () {
 			// Return all account capabilities given in the template, annotated by the information in the template
 			result.capabilityProviders = template.capabilityProviders.map(function (c) {
 				// Find the capability in the account
-				for (var i=0, l=account.capabilityProviders.length; i<l; i++) {
-					if (account.capabilityProviders[i].id === c.id)
+				var i=0, l=account.capabilityProviders.length;
+				for (i=0; i<l; i++) {
+					if (account.capabilityProviders[i].id === c.id){
 						return enyo.mixin(account.capabilityProviders[i], c);
+					}
 				}
 				return c;    
 			});
 			
 			if (account.templateId === "com.palm.sim") {
 				result.SIMRemoved = false;
-				phoneNumber = (result.username)? result.username: "";
+				phoneNumber =  result.username || "";
 				// Was the SIM removed?
 				if (phoneNumber.indexOf("SIMREMOVED ") === 0) {
 					phoneNumber = phoneNumber.substring(11);
@@ -215,7 +226,7 @@ var AccountsUtil = (function () {
 				// If the SIM has been removed put some nice "SIM Removed" text around it
 				result.username = result.phoneNumber;
 				if (result.SIMRemoved) {
-					var template = new enyo.g11n.Template(AccountsUtil.SIM_REMOVED_TEMPLATE);
+					template = new enyo.g11n.Template(AccountsUtil.SIM_REMOVED_TEMPLATE);
 					result.username = template.evaluate({phoneNumber: result.phoneNumber});
 				}
 			}
@@ -225,39 +236,43 @@ var AccountsUtil = (function () {
 		
 		// Promote the capability icons to the main account icons
 		promoteCapabilityIcons: function(accounts, capabilities) {
-			if (!capabilities || !accounts)
+			if (!capabilities || !accounts){
 				return;
-			
+			}
 			// Capability might be an array
-			if (!enyo.isArray(capabilities))
+			if (!enyo.isArray(capabilities)){
 				capabilities = [capabilities];
-				
-			for (var i in capabilities) {
-				capability = capabilities[i];
+			}
+			var ic,i,c,cp, account, capability, deviceInfo;	
+			for (ic in capabilities) {
+				capability = capabilities[ic];
 				// Loop through all the accounts
-				for (var i in accounts) {
-					var account = accounts[i];
+				for (i in accounts) {
+					account = accounts[i];
 					// Find the required capability in the account
-					for (var cp in account.capabilityProviders) {
-						var c = account.capabilityProviders[cp];
-						if (c.capability !== capability)
+					for (cp in account.capabilityProviders) {
+						c = account.capabilityProviders[cp];
+						if (c.capability !== capability){
 							continue;
+						}
 						// Does the capability have icons?
-						if (!c.icon)
+						if (!c.icon){
 							continue;
+						}
 						console.log("Promoting icons for " + account.templateId);
 						// Promote the icons for this capability
 						account.icon = enyo.mixin(account.icon, c.icon);
 						// If the capability is "local filestorage" then give it a better name than "HP webOS Account"
 						if (capability === "LOCAL.FILESTORAGE") {
 							// Use the profile name if it is avialable
-							if (account.deviceName && account.deviceName.length)
+							if (account.deviceName && account.deviceName.length){
 								account.alias = account.deviceName;
-							else {
+							} else {
 								// Use the model name (e.g. TouchPad)
-								var deviceInfo = window.PalmSystem && JSON.parse(PalmSystem.deviceInfo);
-								if (deviceInfo && deviceInfo.modelNameAscii)
+								deviceInfo = window.PalmSystem && JSON.parse(PalmSystem.deviceInfo);
+								if (deviceInfo && deviceInfo.modelNameAscii){
 									account.alias = deviceInfo.modelNameAscii;
+								}
 							}
 							delete account.username;
 							console.log("Local filestore name is " + account.alias);
@@ -270,10 +285,10 @@ var AccountsUtil = (function () {
 		
 		// Dedupe an array, based on the specifies property.  The array passed in is modified by this call.
 		dedupeByProperty: function (items, idProp) {
-			var hash = {};
+			var hash = {}, i=0, l=items.length;
 			
 			//console.log("dedupeByProperty: BEFORE array items: " + items.length);
-			for (var i=0, l=items.length; i<l; i++) {
+			for (i=0; i<l; i++) {
 //				console.log("dedupeByProperty: looking at id = : " + items[i][idProp]);
 				if (hash[items[i][idProp]] === undefined) {
 					hash[items[i][idProp]] = 1;
@@ -292,10 +307,76 @@ var AccountsUtil = (function () {
 			return capability || rawName; 
 		},
 		
+		hasMixedAuth: function(templt){
+			var i, item, cP, mixed = templt && templt.config && templt.config != "" && typeof templt.validator !== "object";
+			if(mixed && templt.config.auth_type){
+				if(templt.config.auth_type === "mixed"){
+					mixed = true;
+				} else if(templt.config.auth_type === "oauth2"){
+					cP = templt.capabilityProviders;
+					if(cP && cP.length >0){
+						for(i=0;i<cP.length;i++){
+							item = cP[i];
+							if(item && item.config && (!item.config.auth_type || item.config.auth_type !== "oauth2")){
+								mixed = true;
+								break;
+							}
+						}
+					}
+				} else { mixed = false;}
+			} else { mixed = false;}
+			return mixed;
+		},
+		
+		oauth2Capabilities: function(templt){
+			//return array of capability names
+			var i, item, scopes =[], cP = templt.capabilityProviders;
+			if(cP && cP.length >0){
+				for(i=0;i<cP.length;i++){
+					item = cP[i];
+					if(item && item.config && item.config.auth_type && item.config.auth_type === "oauth2"){
+						scopes.push(AccountsUtil.getCapabilityText(item.capability));
+					}
+				}
+			}
+			return scopes;
+		},
+		
+		hasValidOauth2Config: function(templt){
+			//assume mixed auth or oauth2 config
+			var i, len, item, prop, config, start, params, val = true;
+			if(!templt.config || !templt.config.oauth2_config){return false;}
+			config = templt.config.oauth2_config;
+			if(!config.auth_params || !config.token_params || !config.refresh_params || !config.client_secret || !config.client_id){ return false;}
+			for(item in config){
+				//console.error("hasValidOauth2Config testing: " + item);
+				if(!config[item] || config[item].length ===0){
+					console.error("Error: required oath2 parameter "+ item +" is not defined.");
+					val = false;
+					break;
+				} //verify the required items exist
+				if(item === "auth_params" ||item === "token_params" ||item === "refresh_params"){
+					params = config[item];
+					// skip first item as it is always the phrase before the token
+					start = item === "auth_params" ? 0:1;
+					for(i=start, len = params.length; i<len ; i++){
+						prop = params[i];
+						//console.error("testing each array member of " + item + " at : " +prop);
+						if(!prop || (prop.indexOf("=")=== -1 && (!config[prop] || config[prop] === ""))){
+							val = false;
+							console.error("Error: required oath2 parameter from "+ item +" is not defined: " + prop);
+							break;
+						}
+					}
+				}
+			}
+			return val;
+		},
+		
 		getSynergyTitle: function(capability) {
-			if (!capability || enyo.isArray(capability))
+			if (!capability || enyo.isArray(capability)){
 				return accountsRb.$L("HP Synergy Services");
-				
+			}
 			switch (capability)
 			{
 				case "CALENDAR":     return accountsRb.$L("Calendar HP Synergy Services");
