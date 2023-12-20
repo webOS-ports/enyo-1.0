@@ -1881,9 +1881,9 @@ enyo.$ = {}, enyo.passiveSupported = function() {
 passiveSupported = !1;
 try {
 var a = {
-(get passive() {
+get passive() {
 return passiveSupported = !0, !1;
-})
+}
 };
 window.addEventListener("test", null, a), window.removeEventListener("test", null, a);
 } catch (b) {
