@@ -30,10 +30,11 @@ enyo.dispatcher = {
 	windowEvents: ["resize", "load", "unload"],
 	connect: function() {
 		var d = enyo.dispatcher;
-		for (var i=0, e; e=d.events[i]; i++) {
+		var i=0, e;
+		for (; e=d.events[i]; i++) {
 			var options = false;
 			if (enyo.passiveSupported()) options = { passive:false }
-			document.addEventListener(c, enyo.dispatch, options);
+			document.addEventListener(e, enyo.dispatch, options);
 		}
 		for (i=0, e; e=d.windowEvents[i]; i++) {
 			window.addEventListener(e, enyo.dispatch, false);

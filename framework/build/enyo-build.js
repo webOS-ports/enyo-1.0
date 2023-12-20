@@ -1900,14 +1900,14 @@ mouseout: 1
 events: [ "mousedown", "mouseup", "mouseover", "mouseout", "mousemove", "mousewheel", "click", "dblclick", "change", "keydown", "keyup", "keypress", "input" ],
 windowEvents: [ "resize", "load", "unload" ],
 connect: function() {
-var a = enyo.dispatcher;
-for (var b = 0, d; d = a.events[b]; b++) {
-var e = !1;
-enyo.passiveSupported() && (e = {
+var a = enyo.dispatcher, b = 0, c;
+for (; c = a.events[b]; b++) {
+var d = !1;
+enyo.passiveSupported() && (d = {
 passive: !1
-}), document.addEventListener(c, enyo.dispatch, e);
+}), document.addEventListener(c, enyo.dispatch, d);
 }
-for (b = 0, d; d = a.windowEvents[b]; b++) window.addEventListener(d, enyo.dispatch, !1);
+for (b = 0, c; c = a.windowEvents[b]; b++) window.addEventListener(c, enyo.dispatch, !1);
 },
 findDispatchTarget: function(a) {
 var b, c = a;
