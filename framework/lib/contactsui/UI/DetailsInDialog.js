@@ -185,6 +185,7 @@ enyo.kind({
 		this.$.moreDetailsGroup.setFields(this.getMoreDetailsFields());
 		this.$.emailGroup.setFields(this.person.getEmails().getArray());
 		this.$.phoneGroup.setFields(this.person.getPhoneNumbers().getArray());
+		this.$.imGroup.getFieldTypeDisplay = this.imTypeDisplay;
 		this.$.imGroup.setFields(this.person.getIms().getArray());
 		this.$.addressGroup.setFields(this.person.getAddresses().getArray());
 		this.$.urlGroup.setFields(this.person.getUrls().getArray());
@@ -326,7 +327,32 @@ enyo.kind({
 	phoneFieldClick: function (inSender, inEvent, inField) {
 		this.openPhoneApp(inSender.getFieldValue(inField), "com.palm.telephony");
 	},
-	showImDropdownArrow: function (inSender, inType) 
+	// webOS: label each IM row with its real service (WhatsApp/Telegram/Signal/...) instead of the
+	// generic "IM". FieldGroup renders inField.x_displayType; the framework leaves it "IM" for the
+	// webOS "type_*" IM services, so resolve it here from the field's serviceName/type. Mirrors the
+	// per-service labels the Contacts app card shows.
+	// webOS: label each IM row by its real service (WhatsApp/Telegram/Signal/...) instead of the
+	// generic "IM". FieldGroup renders whatever getFieldTypeDisplay returns; the stock version reads
+	// the field's x_displayType, which the framework leaves "IM" for the webOS "type_*" IM services
+	// (and IMAddress.x_displayType is a read-only getter, so it can't be overridden on the field).
+	// So we override the imGroup's getFieldTypeDisplay to resolve the service from the field's type.
+	// Fully guarded so it can never break the IM list (falls back to the original "IM" label).
+	imTypeDisplay: function (inField) {
+		var map = {
+			type_whatsapp: "WhatsApp", type_telegram: "Telegram", type_signal: "Signal",
+			type_gometa: "Facebook", type_discord: "Discord", type_teams: "Teams",
+			type_googlechat: "Google Chat", type_irc: "IRC"
+		};
+		try {
+			var dbo = (inField && inField.getDBObject && inField.getDBObject()) || {};
+			var svc = dbo.serviceName || dbo.type;
+			if (svc && ("" + svc).indexOf("type_") === 0) {
+				return map[svc] || ("" + svc).replace(/^type_/, "");
+			}
+		} catch (e) { /* fall through to the stock label */ }
+		return (inField && inField.x_displayType) || "";
+	},
+	showImDropdownArrow: function (inSender, inType)
 	{
 		return (inType === ContactsLib.IMAddress.TYPE.SKYPE);
 	},
