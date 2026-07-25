@@ -25,7 +25,9 @@ enyo.kind({
 	},
 
 	components: [
-		{kind: "Control", height: "520px", layoutKind: "VFlexLayout", className: "", components: [
+		// webOS: 520px is only a safe default. DetailsInDialog.adaptHeight() overrides this height to
+		// (header + min(rows, MAX)) after render and re-centers the dialog, so it sizes to its content.
+		{name: "contentBox", kind: "Control", height: "520px", layoutKind: "VFlexLayout", className: "", components: [
 			{name: "detailsWrapper", flex: 1, kind: "VFlexBox", components: []}
 		]},
 		{kind: "Control", layoutKind: "VFlexLayout", components: [

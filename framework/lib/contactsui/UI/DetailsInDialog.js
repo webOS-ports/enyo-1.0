@@ -32,7 +32,7 @@ enyo.kind({
 		]},
 		{name: "AllDetails", layoutKind: "VFlexLayout", showing: false, components: [
 			{kind: "Control", components: [
-				{kind: "HFlexBox", components: [
+				{kind: "HFlexBox", align: "center", components: [
 					{name: "photo", kind: "Control", className: "icon", components: [
 						{name: "photoImage", className: "img", kind: "Control"},
 						{kind: "Control", className: "mask"}
@@ -56,7 +56,7 @@ enyo.kind({
 		]},
 		{name: "skypeMenu", kind: "PopupSelect", onSelect: "onSkypeMenuSelect", onBeforeOpen: "onSkypeMenuBeforeOpen", onClose: "onSkypeMenuClose"},
 		{kind: "Control", layoutKind: "VFlexLayout", className: "group", flex: 1, components: [
-			{name: "SomeDetails", kind: "Scroller", flex: 1,  horizontal: false, autoHorizontal: false, components: [
+			{name: "SomeDetails", kind: "Scroller", flex: 1, horizontal: false, autoHorizontal: false, components: [
 				{name: "phoneGroup", kind: "com.palm.library.contactsui.FieldGroup", onFieldClick: "phoneFieldClick", onGetActionIcon: "phoneGetActionIcon", onActionIconClick: "phoneActionIconClick"},
 				{name: "emailGroup", kind: "com.palm.library.contactsui.FieldGroup", onFieldClick: "emailFieldClick"},
 				{name: "imGroup", kind: "com.palm.library.contactsui.FieldGroup", onFieldClick: "imFieldClick", onGetFieldValue: "getImFieldValue", onShowArrow: "showImDropdownArrow"},
@@ -199,6 +199,50 @@ enyo.kind({
 //		this.$.favoriteBtn.setState("down", this.person.isFavorite() ? true : false);
 		this.$.favIndicator.addRemoveClass("true", this.person.isFavorite() ? true : false);
 		this.showDetails(true);
+		this.adaptHeight();
+	},
+	// webOS: size the Contact Detail popup to its content instead of a fixed 520px. The flex chain
+	// (contentBox -> wrapper -> detailsInDialog -> group -> Scroller) stays intact so nothing collapses;
+	// we just set the contentBox height = header + min(rows, MAX). The flex:1 Scroller then fills exactly
+	// that, so short contacts get a compact popup and long ones cap + scroll. Finally we re-center, since
+	// Popup memoizes its size/position at open time (Popup.calcSize) and won't re-center on its own.
+	// Fully guarded: any failure leaves the default fixed-height layout intact.
+	adaptHeight: function () {
+		var self = this;
+		enyo.asyncMethod(this, function () { self.doAdaptHeight(0); });
+	},
+	doAdaptHeight: function (attempt) {
+		var self = this;
+		try {
+			// contentBox is the fixed-height box in DetailsDialog (this.owner) that we shrink/grow.
+			var dlg = this.owner;
+			var box = dlg && dlg.$ && dlg.$.contentBox;
+			if (!box || !box.applyStyle || !box.hasNode || !box.hasNode()) { return; }
+			// Natural height of the rows = sum of the rendered FieldGroup nodes (each row is its own
+			// natural height inside the scroller, unaffected by the scroller's flex fill).
+			var groups = ["phoneGroup", "emailGroup", "imGroup", "addressGroup", "urlGroup", "notesGroup", "moreDetailsGroup"];
+			var rows = 0, i, g, n;
+			for (i = 0; i < groups.length; i += 1) {
+				g = this.$[groups[i]];
+				n = g && g.hasNode && g.hasNode();
+				if (n) { rows += n.offsetHeight; }
+			}
+			var hdrNode = this.$.AllDetails && this.$.AllDetails.hasNode && this.$.AllDetails.hasNode();
+			var header = (hdrNode && hdrNode.offsetHeight) || 0;
+			// DOM not laid out yet -> retry a couple of times before giving up.
+			if (rows <= 0 || header <= 0) {
+				if (attempt < 4) { setTimeout(function () { self.doAdaptHeight(attempt + 1); }, 70); }
+				return;
+			}
+			var MIN_ROWS = 60, MAX_ROWS = 380, PAD = 20;
+			var scroller = Math.max(MIN_ROWS, Math.min(rows, MAX_ROWS));
+			var boxH = header + scroller + PAD;
+			box.applyStyle("height", boxH + "px");
+			// Re-center the dialog now its content changed size (dlg is the DetailsDialog/ModalDialog).
+			if (dlg.applyBoundsInfo) {
+				enyo.asyncMethod(dlg, function () { this.applyBoundsInfo(); });
+			}
+		} catch (e) { /* never break the details view */ }
 	},
 	addTypeToNotes: function (array)
 	{
