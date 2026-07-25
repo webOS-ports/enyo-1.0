@@ -25,7 +25,7 @@ enyo.kind({
 	},
 
 	components: [
-		{kind: "Control", height: "460px", layoutKind: "VFlexLayout", className: "", components: [
+		{kind: "Control", height: "520px", layoutKind: "VFlexLayout", className: "", components: [
 			{name: "detailsWrapper", flex: 1, kind: "VFlexBox", components: []}
 		]},
 		{kind: "Control", layoutKind: "VFlexLayout", components: [
