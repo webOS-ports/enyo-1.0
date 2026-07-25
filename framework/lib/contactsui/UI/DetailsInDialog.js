@@ -59,7 +59,7 @@ enyo.kind({
 			{name: "SomeDetails", kind: "Scroller", flex: 1,  horizontal: false, autoHorizontal: false, components: [
 				{name: "phoneGroup", kind: "com.palm.library.contactsui.FieldGroup", onFieldClick: "phoneFieldClick", onGetActionIcon: "phoneGetActionIcon", onActionIconClick: "phoneActionIconClick"},
 				{name: "emailGroup", kind: "com.palm.library.contactsui.FieldGroup", onFieldClick: "emailFieldClick"},
-				{name: "imGroup", kind: "com.palm.library.contactsui.FieldGroup", onFieldClick: "imFieldClick", onShowArrow: "showImDropdownArrow"},
+				{name: "imGroup", kind: "com.palm.library.contactsui.FieldGroup", onFieldClick: "imFieldClick", onGetFieldValue: "getImFieldValue", onShowArrow: "showImDropdownArrow"},
 				{name: "addressGroup", kind: "com.palm.library.contactsui.FieldGroup", onGetFieldValue: "getAddressFieldValue", onFieldClick: "addressFieldClick"},
 				{name: "urlGroup", kind: "com.palm.library.contactsui.FieldGroup", onFieldClick: "urlFieldClick"},
 				{name: "notesGroup", kind: "com.palm.library.contactsui.FieldGroup", onGetFieldValue: "getNotesFieldValue"},
@@ -337,6 +337,43 @@ enyo.kind({
 	// (and IMAddress.x_displayType is a read-only getter, so it can't be overridden on the field).
 	// So we override the imGroup's getFieldTypeDisplay to resolve the service from the field's type.
 	// Fully guarded so it can never break the IM list (falls back to the original "IM" label).
+	// webOS: format the IM row's VALUE like the Contacts card. WhatsApp/Signal IM ids are routable
+	// phone forms (a WhatsApp JID "<phone>@s.whatsapp.net" or a bare +E164) -> show a formatted phone;
+	// Telegram's "id<digits>" -> show the bare number. Display-only; the stored value is unchanged.
+	// Mirrors com.palm.app.contacts PseudoDetailsInApp.getImFieldValue / phoneFromImAddress.
+	getImFieldValue: function (inSender, inField) {
+		var value = (inField && inField.value) || (inField && inField.getDisplayValue && inField.getDisplayValue()) || "";
+		var dbo = (inField && inField.getDBObject && inField.getDBObject()) || null;
+		var type = (dbo && dbo.type) || (inField && inField.getType && inField.getType()) || "";
+		if (type === "type_telegram" && (/^id[0-9]+$/).test(value)) {
+			return value.substring(2);
+		}
+		var phone = this.phoneFromImAddress(value, type);
+		return phone || value;
+	},
+	phoneFromImAddress: function (address, serviceName) {
+		var raw = String(address || "");
+		if (serviceName === "type_gometa") { return ""; }
+		var s = raw.toLowerCase();
+		var at = s.indexOf("@");
+		var isWaJid = (at !== -1) && (s.substring(at) === "@s.whatsapp.net");
+		if (at !== -1 && !isWaJid) { return ""; }
+		var bare = isWaJid ? s.substring(0, at) : s;
+		if (/[a-z\-]/.test(bare)) { return ""; }
+		var digits = bare.replace(/[^0-9]/g, "");
+		if (digits.length < 7 || digits.length > 15) { return ""; }
+		var phoneService = (serviceName === "type_whatsapp" || serviceName === "type_signal");
+		var phoneShaped = isWaJid || /^\+?[0-9]{7,15}$/.test(raw);
+		if (!phoneService && !phoneShaped) { return ""; }
+		var e164 = "+" + digits;
+		try {
+			var numberObj = new enyo.g11n.PhoneNumber(e164);
+			if (numberObj.subscriberNumber) {
+				return (new enyo.g11n.PhoneFmt({style: "default"})).format(numberObj);
+			}
+		} catch (e) { /* fall through to plain e164 */ }
+		return e164;
+	},
 	imTypeDisplay: function (inField) {
 		var map = {
 			type_whatsapp: "WhatsApp", type_telegram: "Telegram", type_signal: "Signal",
