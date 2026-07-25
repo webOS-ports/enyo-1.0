@@ -138,7 +138,7 @@ enyo.kind({
 		 //inline buttons mode
 		this.$.addToNewButtonInline.hide();
 		this.$.addToExistingButtonInline.hide();
-		this.$.editButtonInline.show();
+		this.$.editButtonInline.hide();   // webOS: Edit Contact now lives in the dialog chrome (DetailsDialog), not inline
 		
 
 		this.$.linkCounter.setDepressed(false);
