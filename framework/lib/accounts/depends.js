@@ -1,4 +1,4 @@
-enyo.depends(
+﻿enyo.depends(
 	"css/accounts-list.css",
 	"source/util.js",
 	"source/remove-account.js",
