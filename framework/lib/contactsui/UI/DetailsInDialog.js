@@ -1,6 +1,6 @@
 /*jslint white: true, onevar: true, undef: true, eqeqeq: true, plusplus: true, bitwise: true, 
 regexp: true, newcap: true, immed: true, nomen: false, maxerr: 500 */
-/*global ContactsLib, enyo, console, $L, com, $contactsui_path, PalmSystem, crb */
+/*global ContactsLib, enyo, console, $L, com, $contactsui_path, PalmSystem, crb, PalmCall */
 
 /*
 
@@ -187,6 +187,7 @@ enyo.kind({
 		this.$.phoneGroup.setFields(this.person.getPhoneNumbers().getArray());
 		this.$.imGroup.getFieldTypeDisplay = this.imTypeDisplay;
 		this.$.imGroup.setFields(this.person.getIms().getArray());
+		this.refreshImLabelsWhenReady();
 		this.$.addressGroup.setFields(this.person.getAddresses().getArray());
 		this.$.urlGroup.setFields(this.person.getUrls().getArray());
 		this.$.notesGroup.setFields(this.addTypeToNotes(this.person.getNotes().getArray()));
@@ -418,8 +419,12 @@ enyo.kind({
 		} catch (e) { /* fall through to plain e164 */ }
 		return e164;
 	},
+	// The label comes from the SAME account-template data every messaging service already publishes
+	// (loc_shortName/loc_name via listAccountTemplates) -- see refreshImLabelsWhenReady below --
+	// rather than a hand-maintained map that has to be extended by hand for every new IM service.
+	// The tiny static map is only a same-tick fallback for the instant before that fetch resolves.
 	imTypeDisplay: function (inField) {
-		var map = {
+		var fallback = {
 			type_whatsapp: "WhatsApp", type_telegram: "Telegram", type_signal: "Signal",
 			type_gometa: "Facebook", type_discord: "Discord", type_teams: "Teams",
 			type_googlechat: "Google Chat", type_irc: "IRC"
@@ -427,11 +432,58 @@ enyo.kind({
 		try {
 			var dbo = (inField && inField.getDBObject && inField.getDBObject()) || {};
 			var svc = dbo.serviceName || dbo.type;
+			var dynamic = ContactsLib.IMAddress && ContactsLib.IMAddress._dynamicLabels;
 			if (svc && ("" + svc).indexOf("type_") === 0) {
-				return map[svc] || ("" + svc).replace(/^type_/, "");
+				return (dynamic && dynamic[svc]) || fallback[svc] || ("" + svc).replace(/^type_/, "");
 			}
 		} catch (e) { /* fall through to the stock label */ }
 		return (inField && inField.x_displayType) || "";
+	},
+	// This dialog is shared framework code used from Phone/Messaging's own contact-lookup popups,
+	// not just the Contacts app -- each app is a separate process/JS context, so whichever app opens
+	// this dialog first needs to trigger its own copy of this fetch (com.palm.app.contacts'
+	// ContactsApp.installDynamicIMLabels does the same thing for its own context, and both write to
+	// the same ContactsLib.IMAddress fields, so whichever runs first "wins" and the other just
+	// queues a callback). Re-renders this dialog's IM rows once the fetch resolves, guarded on
+	// personId so a stale response can't overwrite whatever contact is showing by then.
+	refreshImLabelsWhenReady: function () {
+		var IMAddress = ContactsLib.IMAddress, self = this, personId;
+		if (!IMAddress || IMAddress._dynamicLabelsReady) {
+			return;
+		}
+		personId = this.person && this.person.getId && this.person.getId();
+		IMAddress._dynamicLabelsCallbacks = IMAddress._dynamicLabelsCallbacks || [];
+		IMAddress._dynamicLabelsCallbacks.push(function () {
+			if (self.person && self.$.imGroup && self.person.getId && self.person.getId() === personId) {
+				self.$.imGroup.setFields(self.person.getIms().getArray());
+			}
+		});
+		if (IMAddress._dynamicLabelsInstalled) {
+			return;
+		}
+		IMAddress._dynamicLabelsInstalled = true;
+		IMAddress._dynamicLabels = IMAddress._dynamicLabels || {};
+		PalmCall.call("palm://com.palm.service.accounts/", "listAccountTemplates", {"capability": "MESSAGING"}).then(this, function (future) {
+			var results, map = {}, seen = {}, callbacks;
+			try {
+				results = future.result && future.result.results;
+			} catch (e) { /* leave map empty, still mark ready so queued callbacks stop waiting */ }
+			(results || []).forEach(function (tmpl) {
+				(tmpl.capabilityProviders || []).forEach(function (cp) {
+					if (cp && cp.capability === "MESSAGING" && cp.serviceName && !seen[cp.serviceName]) {
+						seen[cp.serviceName] = true;
+						map[cp.serviceName] = cp.loc_shortName || cp.loc_name || tmpl.loc_name || cp.serviceName;
+					}
+				});
+			});
+			IMAddress._dynamicLabels = map;
+			IMAddress._dynamicLabelsReady = true;
+			callbacks = IMAddress._dynamicLabelsCallbacks || [];
+			IMAddress._dynamicLabelsCallbacks = [];
+			callbacks.forEach(function (cb) {
+				try { cb(); } catch (e2) { /* one bad callback shouldn't break the rest */ }
+			});
+		});
 	},
 	showImDropdownArrow: function (inSender, inType)
 	{
