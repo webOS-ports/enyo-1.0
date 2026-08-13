@@ -69,8 +69,13 @@ enyo.g11n.Utils._loadFile = function _loadFile(path) {
 		try {
 			jsonString = palmGetResource(path, "const json");		// get the object from the shared cache
 			
+			// A resource that isn't installed comes back as an empty string, and JSON.parse("")
+			// throws -- so every missing localization file raised a SyntaxError. It is caught
+			// just below and the caller falls back correctly, but the engine still reports it
+			// on the console, which is pure noise. Skip the parse for an empty result, exactly
+			// as the node branch above already does.
 			if ( typeof(jsonString) === 'string' ) {
-				json = JSON.parse(jsonString);
+				json = jsonString ? JSON.parse(jsonString) : undefined;
 			} else {
 				json = jsonString;
 			}
