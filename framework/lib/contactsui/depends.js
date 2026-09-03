@@ -5,7 +5,8 @@ regexp: true, newcap: true, immed: true, nomen: false, maxerr: 500 */
 $contactsui_path = "$enyo-lib/contactsui"; //uncomment when submitting library to enyo
 //$contactsui_path = "/usr/palm/applications/com.palm.app.contacts/contactsui"; //uncomment when submitting library as part of app
 
-runningInBrowser = window.runningInBrowser ? window.runningInBrowser : (window.PalmSystem ? false : true);
+runningInBrowser = (typeof window === "undefined") ? false :
+	(window.runningInBrowser ? window.runningInBrowser : (window.PalmSystem ? false : true));
 
 if (!runningInBrowser) { //this is a global flag that is set by contacts app
 /* device or emulator */
@@ -13,6 +14,7 @@ if (!runningInBrowser) { //this is a global flag that is set by contacts app
 		"/usr/palm/frameworks/mojoloader.js",
 		"$enyo-lib/accounts/",
 		"$enyo-lib/addressing/",
+		"utils/Globals.js",
 		"mojoshim/mojo-serviceRequest.js",
 		"mojoshim/mojoCore-service.js",
 		"mojoshim/importContactsBase.js",
@@ -35,6 +37,7 @@ if (!runningInBrowser) { //this is a global flag that is set by contacts app
 	enyo.depends(
 		"$enyo-lib/accounts/",
 		"$enyo-lib/addressing/",
+		"utils/Globals.js",
 		"Logic/AccountListEnyo.js",
 		"UI/resources.js",		// needs to come before the rest of the UI parts
 		"UI/FieldGroup.js",

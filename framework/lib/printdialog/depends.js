@@ -14,8 +14,6 @@ enyo.depends(
 	"source/PrinterOptions.js",
 	"source/PrinterAdder.js",
 	"source/PrintDialog.js",
-	"css/PrintDialog.css"
+	"css/PrintDialog.css",
+	"source/PrintMediaStyle.js"
 );
-
-// Include stylesheet that hides print dialog in the printed output
-document.write('<link href="' + enyo.path.rewrite("$enyo-lib/printdialog") + '/css/PrintMedia.css" media="print" rel="stylesheet" type="text/css" />');
