@@ -226,21 +226,25 @@ function cleanEmptyFolders(inDir, callback) {
 		function removeEmptyFolders(inFs) {
 			var folders = inFs.folders;
 			var files = inFs.files;
-			if (folders.length) {
-				var g = this.group();
-				folders.reverse().forEach(function(f) {
-					// if the folder has a file in it, skip
-					var needed = files.some(function(fi){ return fi.indexOf(f) == 0 });
-					if (!needed) {
-						if (options.verbose) {
-							log.itemize("Removing empty folder:", f);
-						}
-						fs.rmdir(f, g());
+			// Deepest-first and synchronous: firing the rmdirs in parallel
+			// through a group raced parent rmdirs against child rmdirs, so a
+			// parent could fail ENOTEMPTY while its children were still being
+			// removed, aborting the whole build at random.
+			folders.reverse().forEach(function(f) {
+				// if the folder has a file in it, skip
+				var needed = files.some(function(fi){ return fi.indexOf(f) == 0 });
+				if (!needed) {
+					if (options.verbose) {
+						log.itemize("Removing empty folder:", f);
 					}
-				});
-			} else {
-				return "";
-			}
+					try {
+						fs.rmdirSync(f);
+					} catch (e) {
+						// a failure means the folder has files
+					}
+				}
+			});
+			return "";
 		},
 		function done(){
 			callback();
