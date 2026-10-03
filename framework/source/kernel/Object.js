@@ -98,7 +98,12 @@ enyo.kind({
 	},
 	//* @protected
 	_log: function(inMethod, inArgs) {
-		enyo.logging.log(inMethod, [inArgs.callee.caller.nom + ": "].concat(enyo.cloneArray(inArgs)));
+		// caller is null when log()/warn()/error() was called from strict-mode
+		// code (and from some callbacks) in current V8, and reading .nom off it
+		// threw - out of the very error path that was trying to report.
+		var caller = inArgs.callee.caller;
+		var name = (caller && caller.nom) || "(anonymous)";
+		enyo.logging.log(inMethod, [name + ": "].concat(enyo.cloneArray(inArgs)));
 	}
 });
 
