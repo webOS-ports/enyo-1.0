@@ -21,6 +21,10 @@ if (window.PalmSystem) {
 	Mojo = window.Mojo || {};
 
 	Mojo.handleGesture = function(type, properties) {
+		if (type == "flick") {
+			// the system sends flicks: scrollers stop simulating them
+			enyo.webosGesture.systemFlicks = true;
+		}
 		var synth = enyo.mixin({type: type, target: enyo.webosGesture.lastDownTarget}, properties);
 		enyo.dispatch(synth);
 	};
