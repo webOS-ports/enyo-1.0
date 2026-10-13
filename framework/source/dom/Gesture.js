@@ -28,6 +28,8 @@ enyo.gesture = {
 //* @protected
 	hysteresis: 4,
 	holdDelay: 200,
+	// how long (ms) to wait for the simulated click sent by focusAtPoint
+	focusingTimeout: 300,
 	pulseInterval: 100,
 	// synthesize 'back' event from ESC key on all platforms
 	keyup: function(e) {
@@ -60,9 +62,19 @@ enyo.gesture = {
 		// FIXME: do we need to ascend the parent tree or is it enough to require an explicit flag on the control?
 		return e.dispatchTarget.requiresDomMousedown;
 	},
+	// True while the simulated click sent by focusAtPoint is expected.
+	// Runtimes that ignore PalmSystem.simulateMouseClick (the LuneOS webruntime
+	// lists it as unhandled) never send that click, so the flag times out
+	// instead of swallowing the user's next tap or drag.
+	isFocusing: function() {
+		if (this._isFocusing && new Date().getTime() - this._isFocusing > this.focusingTimeout) {
+			this._isFocusing = false;
+		}
+		return !!this._isFocusing;
+	},
 	mousedown: function(e) {
 		// FIXME: refactor: code only relevant if using device async focusAtPoint api.
-		if (this._isFocusing) {
+		if (this.isFocusing()) {
 			// if mousedown target has changed while focusing, abort focus
 			if (e.target != this.targetEvent.target) {
 				e.preventDefault();
@@ -125,7 +137,7 @@ enyo.gesture = {
 	},
 	mouseup: function(e) {
 		// FIXME: refactor: code only relevant if using device async focusAtPoint api.
-		if (this._isFocusing) {
+		if (this.isFocusing()) {
 			this._isFocusing = false;
 			return true;
 		}
@@ -355,7 +367,8 @@ enyo.requiresWindow(function() {
 		}
 		//
 		enyo.gesture.focusAtPoint = function(e) {
-			enyo.gesture._isFocusing = true;
+			// the time focusing started; see isFocusing
+			enyo.gesture._isFocusing = new Date().getTime();
 			// note: these events are asynchronous, but apparently can be called in order.
 			PalmSystem.simulateMouseClick(Math.round(e.pageX), Math.round(e.pageY), true);
 			PalmSystem.simulateMouseClick(Math.round(e.pageX), Math.round(e.pageY), false);
