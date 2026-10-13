@@ -186,6 +186,7 @@ enyo.kind({
 	},
 	startDrag: function(e) {
 		this.dragging = true;
+		this.dragSamples = [];
 		//
 		this.my = e.pageY;
 		this.py = this.uy = this.y;
@@ -205,17 +206,45 @@ enyo.kind({
 			// provides resistance against dragging into overscroll
 			this.ux = this.boundaryDamping(this.ux, this.leftBoundary, this.rightBoundary, this.kDragDamping);
 			//
+			this.addDragSample();
 			this.start();
 			return true;
 		}
 	},
+	//* how far back (ms) drag positions count towards the release velocity
+	kFlickSampleTime: 100,
+	addDragSample: function() {
+		var now = new Date().getTime(), s = this.dragSamples;
+		s.push({t: now, x: this.ux, y: this.uy});
+		while (s.length > 2 && now - s[0].t > this.kFlickSampleTime) {
+			s.shift();
+		}
+	},
+	// Velocity (px per ms) of the drag over its last kFlickSampleTime ms; zero
+	// when the finger rested before it was lifted.
+	dragVelocity: function() {
+		var s = this.dragSamples || [], now = new Date().getTime();
+		var first = s[0], last = s[s.length - 1];
+		if (s.length < 2 || now - last.t > this.kFlickSampleTime / 2 || last.t == first.t) {
+			return {x: 0, y: 0};
+		}
+		var dt = last.t - first.t;
+		return {x: (last.x - first.x) / dt, y: (last.y - first.y) / dt};
+	},
 	dragDrop: function(e) {
-		if (this.dragging && !window.PalmSystem) {
-			var kSimulatedFlickScalar = 0.5;
+		// Carry the drag's momentum on release, unless the system sends real
+		// 'flick' gestures (legacy webOS does; LuneOS and browsers do not).
+		var systemFlicks = window.PalmSystem && enyo.webosGesture && enyo.webosGesture.systemFlicks;
+		if (this.dragging && !systemFlicks) {
+			// The animation resets y0 to y on every frame of a drag, so the
+			// momentum comes from the drag's recent velocity instead.
+			var v = this.dragVelocity();
 			this.y = this.uy;
-			this.y0 = this.y - (this.y - this.y0) * kSimulatedFlickScalar;
+			this.y0 = this.y - (this.vertical ? v.y * this.frame : 0);
 			this.x = this.ux;
-			this.x0 = this.x - (this.x - this.x0) * kSimulatedFlickScalar;
+			this.x0 = this.x - (this.horizontal ? v.x * this.frame : 0);
+			this.dragging = false;
+			this.start();
 		}
 		this.dragging = false;
 	},
