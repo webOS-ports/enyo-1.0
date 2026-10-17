@@ -208,6 +208,11 @@ enyo.gesture = {
 		return (this.target !== e.target);
 	},
 	click: function(e) {
+		// The click the runtime makes for focusAtPoint is not another tap: the
+		// tap's own click is sent with it (by the touch shim, webkitGesture.js).
+		if (this._simulatingClick) {
+			return true;
+		}
 		if (this.didDrag && !e.dispatchTarget.requiresDomClick) {
 			// reset didDrag just in case somebody might send a click directly
 			// and there was no mouseup to set didDrag.
@@ -369,9 +374,17 @@ enyo.requiresWindow(function() {
 		enyo.gesture.focusAtPoint = function(e) {
 			// the time focusing started; see isFocusing
 			enyo.gesture._isFocusing = new Date().getTime();
-			// note: these events are asynchronous, but apparently can be called in order.
-			PalmSystem.simulateMouseClick(Math.round(e.pageX), Math.round(e.pageY), true);
-			PalmSystem.simulateMouseClick(Math.round(e.pageX), Math.round(e.pageY), false);
+			// A runtime that makes the click at once (the LuneOS webruntime) sends
+			// its click event during these calls: it only places the caret, the
+			// tap's click goes out on its own (see click).
+			enyo.gesture._simulatingClick = true;
+			try {
+				// note: these events are asynchronous, but apparently can be called in order.
+				PalmSystem.simulateMouseClick(Math.round(e.pageX), Math.round(e.pageY), true);
+				PalmSystem.simulateMouseClick(Math.round(e.pageX), Math.round(e.pageY), false);
+			} finally {
+				enyo.gesture._simulatingClick = false;
+			}
 		}
 
 		enyo.gesture.requiresDomMousedown = function(e) {
