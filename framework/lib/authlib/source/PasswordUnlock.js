@@ -27,6 +27,8 @@ enyo.kind({
 	unlock: function() {
 		var value = this.$.passwordInput.getValue();
 		if ( value ) {
+			// Kept until the answer, for onPasswordVerified
+			this.passwordBeingVerified = value;
 			this.$.matchDevicePasscode.call({
 				passCode: value
 			});
@@ -45,9 +47,11 @@ enyo.kind({
 		this.$.popEmergencyMenu.openAt({left: 0, bottom: 24});			
 	},	
 	devicePasswordVerifyResponse: function(inSender, response){
+		var verified = this.passwordBeingVerified;
+		this.passwordBeingVerified = "";
 		if (response.returnValue) {
 			this.reset();
-			this.doPasswordVerified();
+			this.doPasswordVerified(verified);
 		} else {
 			this.$.errorMsg.setShowing(true); 
 						
