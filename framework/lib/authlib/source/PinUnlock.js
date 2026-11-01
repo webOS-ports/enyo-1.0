@@ -4,7 +4,10 @@ enyo.kind({
 	published: {
 		pinSet: false,
 		subtext: ".",
-		securityPolicyState: "none"
+		securityPolicyState: "none",
+		// The passcode set now, when one is: luna-authmanager wants it with
+		// any change of the passcode (SecurityPolicyGuard verifies it first)
+		currentPasscode: ""
 	},
 	events: {
 		onCancelClick: "",
@@ -72,6 +75,8 @@ enyo.kind({
 		}
 		else {
 			if (this.pin && this.pin.length > 0) {
+				// Kept until the answer, for onPinVerified
+				this.pinBeingVerified = this.pin;
 				this.$.matchDevicePasscode.call({
 					passCode: this.pin
 				}, {
@@ -121,10 +126,13 @@ enyo.kind({
 			this.updatePinDisplay();
 		} else {
 			if (this.verifyPin == this.pin) {
-				this.$.sysmanagerService.call({
+				var params = {
 					passCode: this.pin,
 					lockMode: "pin"
-				},{
+				};
+				if (this.currentPasscode)
+					params.currentPasscode = this.currentPasscode;
+				this.$.sysmanagerService.call(params, {
 					method: 'setDevicePasscode',
 					onSuccess: "onSetPin",
 					onFailure: "onSetPinFailure"	
@@ -140,9 +148,11 @@ enyo.kind({
 	}, 
 
 	devicePinVerifyResponse: function(inSender, response){ 
+		var verified = this.pinBeingVerified;
+		this.pinBeingVerified = "";
 		if (response.returnValue) {
-			this.doPinVerified();
 			this.onlyOneRetryRemaining = false;
+			this.doPinVerified(verified);
 		}else{
 			this.$.Text.setContent(rb_auth.$L("PIN incorrect"));
 			
@@ -172,11 +182,21 @@ enyo.kind({
 	}, 
 	
 	onSetPin: function(inSender, response) {
+		this.currentPasscode = "";
 		this.doSetPinSuccess();		
 		this.reset();
 	}, 
 	
 	onSetPinFailure: function(inSender, response) {		
+		// -12: the current passcode was not right (or no longer is)
+		if (response && response.errorCode === -12) {
+			this.currentPasscode = "";
+			this.setErrorMessage(response.lockedOut
+				? rb_auth.$L("Device Locked")
+				: rb_auth.$L("Current PIN not confirmed"));
+			this.doCancelClick();
+			return;
+		}
 		this.setErrorMessage(rb_auth.$L("Passcode does not match security requirements."));
 	},
 	
@@ -195,6 +215,7 @@ enyo.kind({
 	},
 	
 	onCancel: function() {	
+		this.currentPasscode = "";
 		this.reset();
 		this.doCancelClick();
 	}, 

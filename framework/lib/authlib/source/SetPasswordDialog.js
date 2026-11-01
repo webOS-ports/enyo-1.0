@@ -3,7 +3,10 @@ enyo.kind ({
 	kind: enyo.ModalDialog,
 	modal: true,
 	published: {
-		policy: ""
+		policy: "",
+		// The passcode set now, when one is: luna-authmanager wants it with
+		// any change of the passcode (SecurityPolicyGuard verifies it first)
+		currentPasscode: ""
 	},
 	events: {
 		onDone: "",
@@ -44,10 +47,13 @@ enyo.kind ({
 			this.setErrorMessage(rb_auth.$L("Passwords do not match."));
 			this.$.password.forceFocus();
 		} else {
-			this.$.setPassword.call({
+			var params = {
 				passCode: this.$.password.getValue(),
 				lockMode: "password"
-			});
+			};
+			if (this.currentPasscode)
+				params.currentPasscode = this.currentPasscode;
+			this.$.setPassword.call(params);
 		}
 	},
 	open: function() {
@@ -55,16 +61,28 @@ enyo.kind ({
 		this.$.password.forceFocus();
 	},	
 	cancelClick: function(inSender) {
+		this.currentPasscode = "";
 		this.setErrorMessage();
 		this.doCancel();
 		this.close();
 	},
 	setPasswordSuccess: function(inSender) {
+		this.currentPasscode = "";
 		this.setErrorMessage();
 		this.doDone();
 		this.close();
 	},
-	setPasswordFailure: function() {
+	setPasswordFailure: function(inSender, response) {
+		// -12: the current passcode was not right (or no longer is)
+		if (response && response.errorCode === -12) {
+			this.currentPasscode = "";
+			this.setErrorMessage(response.lockedOut
+				? rb_auth.$L("Device Locked.  Try Again Later.")
+				: rb_auth.$L("Your current password could not be confirmed."));
+			this.doCancel();
+			this.close();
+			return;
+		}
 		this.setErrorMessage(rb_auth.$L("Password does not match security requirements."));
 		this.$.password.forceFocus();
 	},
