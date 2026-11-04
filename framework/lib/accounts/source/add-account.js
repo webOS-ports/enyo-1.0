@@ -70,6 +70,7 @@ enyo.kind({
 	// provides (messaging before contacts so WhatsApp/Telegram land in Messaging).
 	categoryOrder: [
 		{cap: "Music",         label: $L("MUSIC")},
+		{cap: "Video",         label: $L("VIDEO")},
 		{cap: "MAIL",          label: $L("EMAIL")},
 		{cap: "MESSAGING",     label: $L("MESSAGING & CHAT")},
 		{cap: "IM",            label: $L("MESSAGING & CHAT")},
@@ -84,18 +85,18 @@ enyo.kind({
 		{cap: "PHONE",         label: $L("PHONE")},
 		{cap: "SMS",           label: $L("PHONE")}
 	],
-	// DISPLAY order of the groups (user-requested): Email, Contacts, Messaging, Cloud, Music, Phone, Other.
-	displayOrder: [$L("EMAIL"), $L("CONTACTS & CALENDAR"), $L("MESSAGING & CHAT"), $L("CLOUD & PHOTOS"), $L("MUSIC"), $L("PHONE")],
+	// DISPLAY order of the groups (user-requested): Email, Contacts, Messaging, Cloud, Music, Video, Phone, Other.
+	displayOrder: [$L("EMAIL"), $L("CONTACTS & CALENDAR"), $L("MESSAGING & CHAT"), $L("CLOUD & PHOTOS"), $L("MUSIC"), $L("VIDEO"), $L("PHONE")],
 	otherLabel: $L("OTHER"),
 
 	// #1 friendly word per capability + the order listed (most identifying first), capped to 3.
 	capLabels: {
-		"Music": $L("Music"), "MAIL": $L("Email"), "MESSAGING": $L("Messaging"), "IM": $L("Messaging"),
+		"Music": $L("Music"), "Video": $L("Video"), "MAIL": $L("Email"), "MESSAGING": $L("Messaging"), "IM": $L("Messaging"),
 		"CONTACTS": $L("Contacts"), "REMOTECONTACTS": $L("Contacts"), "CALENDAR": $L("Calendar"),
 		"TASKS": $L("Tasks"), "MEMOS": $L("Notes"), "DOCUMENTS": $L("Files"),
 		"PHOTO.UPLOAD": $L("Photos"), "VIDEO.UPLOAD": $L("Videos"), "PHONE": $L("Calls"), "SMS": $L("SMS")
 	},
-	subtitleOrder: ["Music","MAIL","MESSAGING","IM","CONTACTS","REMOTECONTACTS","CALENDAR","DOCUMENTS","PHOTO.UPLOAD","VIDEO.UPLOAD","TASKS","MEMOS","PHONE","SMS"],
+	subtitleOrder: ["Music","Video","MAIL","MESSAGING","IM","CONTACTS","REMOTECONTACTS","CALENDAR","DOCUMENTS","PHOTO.UPLOAD","VIDEO.UPLOAD","TASKS","MEMOS","PHONE","SMS"],
 
 	_filter: "",
 
