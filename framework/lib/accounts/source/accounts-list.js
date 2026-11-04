@@ -2,28 +2,28 @@
 // A watch keeps the list in sync as accounts are added/removed.
 //
 // CUSTOMISED (org.webosports.app.music accounts UX): with grouped:true the accounts are
-// shown as NESTED group boxes — an outer RowGroup (caption = groupTitle, "SYNERGY
-// ACCOUNTS") containing one inner RowGroup box PER CATEGORY (Email/Contacts/Messaging/
-// Cloud/Music/…), same order as the Add-Account list. Rows: icon + [name / capabilities]
-// left & TOP-aligned, credentials RIGHT-aligned (matching the left whitespace), error last.
+// shown under a divider (caption = groupTitle, "SYNERGY ACCOUNTS") as one RowGroup box
+// PER CATEGORY (Email/Contacts/Messaging/Cloud/Music/Video/…), same order as the
+// Add-Account list. The category boxes are not nested inside an outer box.
+// Rows: icon + [name / capabilities] left & TOP-aligned, credentials RIGHT-aligned (matching the left whitespace), error last.
 
-// One category box (inner RowGroup + VirtualRepeater), created per category inside the outer box.
+// One category box (RowGroup + VirtualRepeater), created per category.
 enyo.kind({
 	name: "Accounts.accountGroup",
 	kind: "enyo.Control",
+	style: "margin-top:15px;",
 	published: { accounts: [], caption: "", ownerList: null },
 	events: { onAccountRow_Selected: "" },
 	components: [
-		{name: "grp", kind: "RowGroup", className: "accounts-group", style: "margin: 2px 2px;", components: [
+		{name: "grp", kind: "RowGroup", className: "accounts-group", components: [
 			{name: "list", kind: "VirtualRepeater", className: "accounts-rowgroup-item", onSetupRow: "setupRow", onclick: "rowTapped", components: [
 				{kind: "Item", name: "Account", layoutKind: "HFlexLayout", align: "start", tapHighlight: true, className: "accounts-list-item enyo-text-ellipsis", style: "padding-top:6px; padding-bottom:6px;", components: [
 					{kind: "Image", name: "agIcon", className: "icon-image"},
-					{kind: "VFlexBox", align: "start", components: [
-						{name: "agName"},
-						{name: "agCat", style: "font-size:11px; color:#8a8a8a; margin-top:1px;"}
+					{kind: "VFlexBox", flex: 1, style: "width:0;", components: [
+						{name: "agName", className: "enyo-text-ellipsis"},
+						{name: "agCat", className: "enyo-text-ellipsis", style: "font-size:11px; color:#8a8a8a; margin-top:1px;"}
 					]},
-					{kind: "Control", flex: 1},
-					{name: "agEmail", className: "email-address enyo-text-ellipsis", style: "text-align:right;"},
+					{name: "agEmail", className: "email-address", style: "white-space:nowrap; text-align:right;"},
 					{kind: "Image", name: "agErr", src: AccountsUtil.libPath + "images/header-warning-icon.png", className: "warning-icon"}
 				]}
 			]}
@@ -54,22 +54,20 @@ enyo.kind({
 	},
 	components: [
 		{name: "accounts", kind: "Accounts.getAccounts", onGetAccounts_AccountsAvailable: "onAccountsAvailable"},
-		// grouped: outer box (SYNERGY ACCOUNTS) with per-category inner boxes inside
-		{name: "synergyBox", kind: "RowGroup", className: "accounts-group", showing: false, components: [
-			// negative margin pulls the inner category boxes out to the outer frame,
-			// removing the top/bottom/side spacing inside the SYNERGY ACCOUNTS box.
-			{name: "groups", style: "margin: -16px -8px -14px -8px;"}		// top/bottom pulled to match the side inset
+		// grouped: divider (groupTitle) above one box per category
+		{name: "synergy", showing: false, components: [
+			{name: "title", kind: "Divider", caption: "", showing: false},
+			{name: "groups"}
 		]},
 		// flat (SIM etc.)
 		{name: "list", kind: "VirtualRepeater", onSetupRow: "listGetItem", onclick: "accountSelected", className:"accounts-rowgroup-item", components: [
 			{kind: "Item", name: "flatAccount", layoutKind: "HFlexLayout", align:"start", tapHighlight:true, className:"accounts-list-item enyo-text-ellipsis", style: "padding-top:6px; padding-bottom:6px;", components: [
 				{kind: "Image", name: "flatIcon", className: "icon-image"},
-				{kind: "VFlexBox", align: "start", components: [
-					{name: "flatName"},
-					{name: "flatCategory", style: "font-size:11px; color:#8a8a8a; margin-top:1px;"}
+				{kind: "VFlexBox", flex: 1, style: "width:0;", components: [
+					{name: "flatName", className: "enyo-text-ellipsis"},
+					{name: "flatCategory", className: "enyo-text-ellipsis", style: "font-size:11px; color:#8a8a8a; margin-top:1px;"}
 				]},
-				{kind: "Control", flex: 1},
-				{name: "flatEmail", className: "email-address enyo-text-ellipsis", style: "text-align:right;"},
+				{name: "flatEmail", className: "email-address", style: "white-space:nowrap; text-align:right;"},
 				{kind: "Image", name: "flatError", src: AccountsUtil.libPath + "images/header-warning-icon.png", className: "warning-icon"}
 			]}
 		]},
@@ -78,22 +76,22 @@ enyo.kind({
 
 	// --- category derivation (shared with the Add-Account grouping) ---
 	categoryOrder: [
-		{cap: "Music", label: $L("MUSIC")}, {cap: "MAIL", label: $L("EMAIL")},
+		{cap: "Music", label: $L("MUSIC")}, {cap: "Video", label: $L("VIDEO")}, {cap: "MAIL", label: $L("EMAIL")},
 		{cap: "MESSAGING", label: $L("MESSAGING & CHAT")}, {cap: "IM", label: $L("MESSAGING & CHAT")},
 		{cap: "DOCUMENTS", label: $L("CLOUD & PHOTOS")}, {cap: "PHOTO.UPLOAD", label: $L("CLOUD & PHOTOS")}, {cap: "VIDEO.UPLOAD", label: $L("CLOUD & PHOTOS")},
 		{cap: "CALENDAR", label: $L("CONTACTS & CALENDAR")}, {cap: "CONTACTS", label: $L("CONTACTS & CALENDAR")}, {cap: "REMOTECONTACTS", label: $L("CONTACTS & CALENDAR")},
 		{cap: "TASKS", label: $L("CONTACTS & CALENDAR")}, {cap: "MEMOS", label: $L("CONTACTS & CALENDAR")},
 		{cap: "PHONE", label: $L("PHONE")}, {cap: "SMS", label: $L("PHONE")}
 	],
-	displayOrder: [$L("EMAIL"), $L("CONTACTS & CALENDAR"), $L("MESSAGING & CHAT"), $L("CLOUD & PHOTOS"), $L("MUSIC"), $L("PHONE")],
+	displayOrder: [$L("EMAIL"), $L("CONTACTS & CALENDAR"), $L("MESSAGING & CHAT"), $L("CLOUD & PHOTOS"), $L("MUSIC"), $L("VIDEO"), $L("PHONE")],
 	otherLabel: $L("OTHER"),
 	capLabels: {
-		"Music": $L("Music"), "MAIL": $L("Email"), "MESSAGING": $L("Messaging"), "IM": $L("Messaging"),
+		"Music": $L("Music"), "Video": $L("Video"), "MAIL": $L("Email"), "MESSAGING": $L("Messaging"), "IM": $L("Messaging"),
 		"CONTACTS": $L("Contacts"), "REMOTECONTACTS": $L("Contacts"), "CALENDAR": $L("Calendar"),
 		"TASKS": $L("Tasks"), "MEMOS": $L("Notes"), "DOCUMENTS": $L("Files"),
 		"PHOTO.UPLOAD": $L("Photos"), "VIDEO.UPLOAD": $L("Videos"), "PHONE": $L("Calls"), "SMS": $L("SMS")
 	},
-	subtitleOrder: ["Music","MAIL","MESSAGING","IM","CONTACTS","REMOTECONTACTS","CALENDAR","DOCUMENTS","PHOTO.UPLOAD","VIDEO.UPLOAD","TASKS","MEMOS","PHONE","SMS"],
+	subtitleOrder: ["Music","Video","MAIL","MESSAGING","IM","CONTACTS","REMOTECONTACTS","CALENDAR","DOCUMENTS","PHOTO.UPLOAD","VIDEO.UPLOAD","TASKS","MEMOS","PHONE","SMS"],
 
 	getAccountsList: function (capability, exclude, dontDisplayErrors) {
 		this.dontDisplayErrors = dontDisplayErrors;
@@ -110,7 +108,7 @@ enyo.kind({
 			this.$.list.hide();
 			this.renderGrouped();
 		} else {
-			this.$.synergyBox.hide();
+			this.$.synergy.hide();
 			this.$.list.setStripSize(this.accounts.length);
 			this.$.list.render();
 		}
@@ -121,7 +119,7 @@ enyo.kind({
 		}
 	},
 
-	// --- grouped rendering: outer box + inner per-category boxes ---
+	// --- grouped rendering: divider + one box per category ---
 	renderGrouped: function() {
 		var kids = this.$.groups.children.slice(0);
 		for (var d = 0; d < kids.length; d++) { kids[d].destroy(); }
@@ -139,8 +137,9 @@ enyo.kind({
 				{kind: "Accounts.accountGroup", caption: order[o], ownerList: this, onAccountRow_Selected: "onGroupAccountSelected"}, {owner: this});
 			g.setAccounts(byCat[order[o]]);
 		}
-		if (this.$.synergyBox.setCaption) { this.$.synergyBox.setCaption(this.groupTitle); }
-		this.$.synergyBox.setShowing(order.length > 0);
+		this.$.title.setCaption(this.groupTitle);
+		this.$.title.setShowing(!!this.groupTitle);
+		this.$.synergy.setShowing(order.length > 0);
 		this.$.groups.render();
 	},
 	onGroupAccountSelected: function(inSender, inEvent) {
