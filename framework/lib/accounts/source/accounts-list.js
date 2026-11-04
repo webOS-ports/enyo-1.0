@@ -19,11 +19,11 @@ enyo.kind({
 			{name: "list", kind: "VirtualRepeater", className: "accounts-rowgroup-item", onSetupRow: "setupRow", onclick: "rowTapped", components: [
 				{kind: "Item", name: "Account", layoutKind: "HFlexLayout", align: "start", tapHighlight: true, className: "accounts-list-item enyo-text-ellipsis", style: "padding-top:6px; padding-bottom:6px;", components: [
 					{kind: "Image", name: "agIcon", className: "icon-image"},
-					{kind: "VFlexBox", align: "start", components: [
-						{name: "agName"},
-						{name: "agCat", style: "font-size:11px; color:#8a8a8a; margin-top:1px;"}
+					{kind: "VFlexBox", flex: 1, style: "width:0;", components: [
+						{name: "agName", className: "enyo-text-ellipsis"},
+						{name: "agCat", className: "enyo-text-ellipsis", style: "font-size:11px; color:#8a8a8a; margin-top:1px;"}
 					]},
-					{name: "agEmail", flex: 1, className: "email-address enyo-text-ellipsis", style: "width:0; text-align:right;"},
+					{name: "agEmail", className: "email-address", style: "white-space:nowrap; text-align:right;"},
 					{kind: "Image", name: "agErr", src: AccountsUtil.libPath + "images/header-warning-icon.png", className: "warning-icon"}
 				]}
 			]}
@@ -63,11 +63,11 @@ enyo.kind({
 		{name: "list", kind: "VirtualRepeater", onSetupRow: "listGetItem", onclick: "accountSelected", className:"accounts-rowgroup-item", components: [
 			{kind: "Item", name: "flatAccount", layoutKind: "HFlexLayout", align:"start", tapHighlight:true, className:"accounts-list-item enyo-text-ellipsis", style: "padding-top:6px; padding-bottom:6px;", components: [
 				{kind: "Image", name: "flatIcon", className: "icon-image"},
-				{kind: "VFlexBox", align: "start", components: [
-					{name: "flatName"},
-					{name: "flatCategory", style: "font-size:11px; color:#8a8a8a; margin-top:1px;"}
+				{kind: "VFlexBox", flex: 1, style: "width:0;", components: [
+					{name: "flatName", className: "enyo-text-ellipsis"},
+					{name: "flatCategory", className: "enyo-text-ellipsis", style: "font-size:11px; color:#8a8a8a; margin-top:1px;"}
 				]},
-				{name: "flatEmail", flex: 1, className: "email-address enyo-text-ellipsis", style: "width:0; text-align:right;"},
+				{name: "flatEmail", className: "email-address", style: "white-space:nowrap; text-align:right;"},
 				{kind: "Image", name: "flatError", src: AccountsUtil.libPath + "images/header-warning-icon.png", className: "warning-icon"}
 			]}
 		]},
