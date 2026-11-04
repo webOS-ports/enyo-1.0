@@ -23,8 +23,7 @@ enyo.kind({
 						{name: "agName"},
 						{name: "agCat", style: "font-size:11px; color:#8a8a8a; margin-top:1px;"}
 					]},
-					{kind: "Control", flex: 1},
-					{name: "agEmail", className: "email-address enyo-text-ellipsis", style: "text-align:right;"},
+					{name: "agEmail", flex: 1, className: "email-address enyo-text-ellipsis", style: "width:0; text-align:right;"},
 					{kind: "Image", name: "agErr", src: AccountsUtil.libPath + "images/header-warning-icon.png", className: "warning-icon"}
 				]}
 			]}
@@ -68,8 +67,7 @@ enyo.kind({
 					{name: "flatName"},
 					{name: "flatCategory", style: "font-size:11px; color:#8a8a8a; margin-top:1px;"}
 				]},
-				{kind: "Control", flex: 1},
-				{name: "flatEmail", className: "email-address enyo-text-ellipsis", style: "text-align:right;"},
+				{name: "flatEmail", flex: 1, className: "email-address enyo-text-ellipsis", style: "width:0; text-align:right;"},
 				{kind: "Image", name: "flatError", src: AccountsUtil.libPath + "images/header-warning-icon.png", className: "warning-icon"}
 			]}
 		]},
