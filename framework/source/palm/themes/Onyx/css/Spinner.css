@@ -15,11 +15,12 @@
 @media (-webkit-min-device-pixel-ratio:1.5) {
 	.enyo-spinner {
 		background-image: url(../images-1.5/spinner.png);
-		background-size: 32px 384px;
+		/* one frame, turned by enyo-rotating-image */
+		background-size: 32px 32px;
 	}
 
 	.enyo-spinner-large {
 		background-image: url(../images-1.5/spinner-large.png);
-		background-size: 128px 1536px;
+		background-size: 128px 128px;
 	}
 }
