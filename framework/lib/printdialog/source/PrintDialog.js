@@ -131,7 +131,7 @@ enyo.kind({
 		]},
 		{kind: "HFlexBox", pack: "justify", align: "center", defaultKind: "Button", components: [
 			{name: "cancelButton", flex: 1, onclick: "clickCancel"},
-			{name: "printButton", flex: 1, disabled: true, onclick: "clickPrint", className: "enyo-button-dark"}
+			{name: "printButton", flex: 1, disabled: true, onclick: "clickPrint", className: "enyo-button-affirmative"}
 		]}
 	],
 	
@@ -149,6 +149,9 @@ enyo.kind({
 	},
 	
 	open: function() {
+		// Room for the printer and its options: 286px, the TouchPad's, cut the last option
+		// off on a phone. As tall as they need, but no taller than the screen has room for.
+		this.setContentHeight(Math.max(286, Math.min(360, window.innerHeight - 80)) + "px");
 		this.inherited(arguments);
 		
 		// Start locating printers
