@@ -4,7 +4,7 @@ additional help content.  It is meant to be used inside an <a href="#enyo.AppMen
 
 	{kind: "AppMenu", components: [
 		{kind: "EditMenu"},
-		{kind: "HelpMenu", target: "http://help.palm.com/phone/index.html"}
+		{kind: "HelpMenu", target: "https://help.luneos.org/phone/index.html"}
 	]}
 	
 For internal HP/Palm applications, this will start the on-device Help application.  If
