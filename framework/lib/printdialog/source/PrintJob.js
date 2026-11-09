@@ -33,7 +33,8 @@ the subclass.
 			]},
 			{name: "launchPrintStatus", kind: "PalmService", service: "palm://com.palm.applicationManager/", 
 				method: "open",
-				params: {id: "com.palm.app.printmanager", params: {"$disableCardPreLaunch": true, "runHeadless": true}},
+				// LuneOS: the Print Manager is a Settings app
+				params: {id: "org.webosports.app.settings.printmanager", params: {"$disableCardPreLaunch": true, "runHeadless": true}},
 				onSuccess: "launchPrintStatusSuccess",
 				onFailure: "launchPrintStatusFailure"},
 			{name: "progressPopup", kind: "ProgressPopup", onClose: "closeProgressPopup", onCancel: "clickCancel"}
