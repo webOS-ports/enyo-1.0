@@ -69,7 +69,12 @@ enyo.kind({
 		// Save the path to index file, for use with document-relative icons.
 		this.docPath = params.docPath;
 		this.docPath = this.docPath.slice(0,this.docPath.lastIndexOf('/')+1);
-		this.layers = params.layers;
+		// A copy: under WAM the opener's params object itself becomes
+		// enyo.windowParams (assignWindowParams keeps an object as it is), so
+		// this was the app's own enyo.Dashboard layers array. A swipe then
+		// popped it twice - here and in the app's doLayerSwipe - and the
+		// next swipe found it empty and closed the dashboard.
+		this.layers = (params.layers || []).slice(0);
 		this.indicateNewContent(true);	
 		// Configure layer clipping properly.
 		// This lets upper layers clip out lower ones, which is needed since they're transparent.
@@ -114,6 +119,7 @@ enyo.kind({
 		this.setIcon(layers[layers.length-1].icon);
 		this.$.layer1.setSwipeable(!layers[2]);
 		this.$.topSwipeable.setSwipeable(!layers[1]);
+		this.tellShellLayerCount(len);
 		if (len > 1) {
 			this.$.count.setContent(len);
 			this.$.badge.show();
@@ -121,10 +127,20 @@ enyo.kind({
 			this.$.badge.hide();
 		}
 	},
+	// LuneOS: the shell (luna-next-cardshell) wraps every dashboard in a
+	// swipe of its own, which took the drag before the layers above could,
+	// and slid the whole dashboard. With more than one layer it leaves the
+	// drag to us, so only the top layer goes; with one, it slides the
+	// dashboard as a whole, as sysmgr did.
+	tellShellLayerCount: function(inCount) {
+		if (window.PalmSystem && PalmSystem.setWindowProperty) {
+			PalmSystem.setWindowProperty("LuneOS_dashLayers", String(inCount));
+		}
+	},
 	handleNewLayers: function(params) {
 		var layers = params && params.layers;
 		this.indicateNewContent(layers && layers.length && layers.length >= this.layers.length);
-		this.layers = layers || [];
+		this.layers = (layers || []).slice(0);
 		this.updateContents();
 	},
 	setIcon: function(path) {
