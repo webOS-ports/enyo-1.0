@@ -5,7 +5,17 @@ enyo.kind({
 	name: "enyo.AnimatedSwipeableItem",
 	kind: enyo.SwipeableItem,
 	dragstartHandler: function() {
-		return !!this.exitIntervalId || this.inherited(arguments);
+		var handled = !!this.exitIntervalId || this.inherited(arguments);
+		this.markDragging(this.handlingDrag);
+		return handled;
+	},
+	// While anything is being dragged, or sliding back or off after one, the
+	// window's body says so: dashboard.css lights a pressed pill on a phone,
+	// as Mojo did, and a drag is not a press.
+	markDragging: function(inDragging) {
+		if (document.body && document.body.classList) {
+			document.body.classList[inDragging ? "add" : "remove"]("luneos-dragging");
+		}
 	},
 	dragHandler: function() {
 		return !!this.exitIntervalId || this.inherited(arguments);
@@ -16,6 +26,7 @@ enyo.kind({
 		}
 		if (this.handlingDrag) {
 			var dx = this.getDx(inEvent);
+			this.markDragging(true);
 			this.setSwipeable(false);
 			this.exitPos = dx;
 			this.exitDirection = dx > 0 ? 1 : -1;
@@ -56,6 +67,7 @@ enyo.kind({
 	animationComplete: function() {
 		this.resetPosition();
 		this.setSwipeable(true);
+		this.markDragging(false);
 	},
 	resetPosition: function() {
 		if (this.exitIntervalId) {
