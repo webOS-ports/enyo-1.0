@@ -5,6 +5,10 @@ enyo.kind({
 	className: "dashboard-notification-module",
 	components: [
 		{kind: "ApplicationEvents", onWindowActivated:"dbActivated", onWindowDeactivated:"dbDeactivated"},
+		// LuneOS: Settings' choice of notification look (luna-next-cardshell's NotificationLayout)
+		// (enyo.PalmService, as enyo.PreferencesService is not in enyo-build.js)
+		{name: "stylePrefs", kind: "enyo.PalmService", service: "palm://com.palm.systemservice/",
+			method: "getPreferences", subscribe: true, onSuccess: "stylePrefsFetched"},
 		{name: 'topSwipeable', kind:"enyo.AnimatedSwipeableItem", layoutKind: "HFlexLayout", confirmRequired:false, onConfirm: "dbSwiped", allowLeft:false, components: [ 
 			{ className:'palm-dashboard-icon-container', onclick: "iconTapHandler", components: [
 					{name:'icon', className: "dashboard-icon", kind:enyo.Image},
@@ -75,6 +79,10 @@ enyo.kind({
 		// popped it twice - here and in the app's doLayerSwipe - and the
 		// next swipe found it empty and closed the dashboard.
 		this.layers = (params.layers || []).slice(0);
+		this.setPhoneLook(this.isLuneOSPhone());
+		if (this.shellSlidesWhole()) {
+			this.$.stylePrefs.call({keys: ["notificationStyle"]});
+		}
 		this.indicateNewContent(true);	
 		// Configure layer clipping properly.
 		// This lets upper layers clip out lower ones, which is needed since they're transparent.
@@ -85,11 +93,39 @@ enyo.kind({
 		// Make sure we're destroyed on window close, so we're removed from our owner's child list.
 		this.boundDestroy = enyo.bind(this, "destroy");
 		window.addEventListener('unload', this.boundDestroy);
+		// LuneOS: which pill the finger is on, for dashboard.css to light on a
+		// phone. Not CSS's :active, which Chromium never sets in this window:
+		// Enyo takes touchstart for its own gestures and prevents its default.
+		this.boundPress = enyo.bind(this, "pressChanged");
+		for (var i = 0; i < this.pressEvents.length; i++) {
+			document.addEventListener(this.pressEvents[i], this.boundPress, true);
+		}
+	},
+	pressEvents: ["touchstart", "touchend", "touchcancel", "mousedown", "mouseup"],
+	pressChanged: function(e) {
+		if (this.pressedNode) {
+			this.pressedNode.classList.remove("luneos-pressed");
+			this.pressedNode = null;
+		}
+		if (!this.phoneLook || (e.type !== "touchstart" && e.type !== "mousedown") || !e.target || !e.target.closest) {
+			return;
+		}
+		// One layer is one pill, the whole entry; with more, the icon's or the
+		// text's of the layer pressed.
+		var pill = this.hasClass("single") ? this.$.topSwipeable.hasNode()
+			: e.target.closest(".palm-dashboard-icon-container, .palm-dashboard-text-container");
+		if (pill && (pill === e.target || pill.contains(e.target))) {
+			pill.classList.add("luneos-pressed");
+			this.pressedNode = pill;
+		}
 	},
 	// NOTE: destroy() is installed as an event listener for window unload, since it's not called automatically.
 	destroy: function() {
 		this.indicateNewContent(false);
 		window.removeEventListener('unload', this.boundDestroy);
+		for (var i = 0; i < this.pressEvents.length; i++) {
+			document.removeEventListener(this.pressEvents[i], this.boundPress, true);
+		}
 		// If we're closed while there are layers, then the user swiped us away.
 		if(this.layers.length) {
 			this.layers.length = 0;
@@ -118,7 +154,14 @@ enyo.kind({
 		// Set icon to match top layer:
 		this.setIcon(layers[layers.length-1].icon);
 		this.$.layer1.setSwipeable(!layers[2]);
-		this.$.topSwipeable.setSwipeable(!layers[1]);
+		// The whole dashboard slides once one layer is left - by the shell's
+		// swipe, where there is one (tellShellLayerCount). Both at once, the
+		// shell's took the touch from the page part way, the page never saw it
+		// end, and its swipe stayed where it had got to, and went on with the
+		// next touch.
+		this.$.topSwipeable.setSwipeable(!layers[1] && !this.shellSlidesWhole());
+		this.addRemoveClass("single", len === 1);
+		this.addRemoveClass("stacked", len > 2);
 		this.tellShellLayerCount(len);
 		if (len > 1) {
 			this.$.count.setContent(len);
@@ -133,8 +176,56 @@ enyo.kind({
 	// drag to us, so only the top layer goes; with one, it slides the
 	// dashboard as a whole, as sysmgr did.
 	tellShellLayerCount: function(inCount) {
-		if (window.PalmSystem && PalmSystem.setWindowProperty) {
+		if (this.shellSlidesWhole()) {
 			PalmSystem.setWindowProperty("LuneOS_dashLayers", String(inCount));
+		}
+	},
+	shellSlidesWhole: function() {
+		return !!(window.PalmSystem && PalmSystem.setWindowProperty);
+	},
+	// LuneOS: a phone's shell (luna-next-cardshell with TabletUi off) lists
+	// its notifications as webOS 2.2.4 did, an icon pill and a text pill, and
+	// dashboard.css draws these the same way there. A tablet's is webOS 3.0's,
+	// which is what this window always drew; so is any shell that does not say.
+	isLuneOSPhone: function() {
+		var info = window.PalmSystem && PalmSystem.deviceInfo;
+		if (typeof info === "string") {
+			try {
+				info = JSON.parse(info);
+			} catch (e) {
+				info = null;
+			}
+		}
+		return !!info && info.tabletUi === false;
+	},
+	// "phone" or "tablet" as Settings' Notifications page chose it, or "auto"
+	// (or nothing, on a shell that has no such setting): the device's own.
+	stylePrefsFetched: function(inSender, inResponse) {
+		var style = inResponse && inResponse.notificationStyle;
+		this.setPhoneLook(style === "phone" || (style !== "tablet" && this.isLuneOSPhone()));
+	},
+	setPhoneLook: function(inPhone) {
+		inPhone = !!inPhone;
+		if (this.phoneLook === inPhone) {
+			return;
+		}
+		this.phoneLook = inPhone;
+		this.addRemoveClass("luneos-phone", inPhone);
+		// A tablet's in the LuneOS shell, whose rows size their text by the row
+		this.addRemoveClass("luneos-tablet", !inPhone && this.shellSlidesWhole());
+		// A layer shows the one under it past its own left edge, as far as
+		// past its rounded corners, or they would show nothing behind them; on
+		// a phone the layer over it is opaque, so the rest does not show. The
+		// top one starts 22px further in than the middle one (dashboard.css),
+		// its corners a sixth of the height round. The tablet's are Enyo's.
+		this.$.layer1.setLeftOffset(inPhone ? 40 : 0);
+		this.$.layer2.setLeftOffset(inPhone ? 60 : 15);
+		// and the layers under clipped to the new offsets, as setLayer does
+		this.$.layer1.configureClipping(this.$.layer1, this.$.layer1.layer ? 0 : null);
+		this.$.layer2.configureClipping(this.$.layer2, this.$.layer2.layer ? 0 : null);
+		// so that the shell draws no bar of its own behind ours
+		if (this.shellSlidesWhole()) {
+			PalmSystem.setWindowProperty("LuneOS_dashOwnBar", inPhone ? "true" : "false");
 		}
 	},
 	handleNewLayers: function(params) {
