@@ -1,13 +1,24 @@
 /* Dashboard module */
 
+/*
+ * Laid out for a window 320 px wide and 50 high, the size sysmgr gave every
+ * dashboard; a shell may give another (luna-next-cardshell: the width of its
+ * list, at its scale). The layers reach the window's right edge and the icon
+ * is centred in its height, which at 320 by 50 is where they always were.
+ */
+html, body {
+	height: 100%;
+}
+
 body {
 	font-family: Prelude, 'Prelude Medium', 'Segoe UI', Arial, Helvetica, sans-serif;
 	margin: 0;
 	background:transparent;
+	overflow: hidden;
 }
 
 .dashboard-notification-module {
-	height: 50px;
+	height: 100%;
 	display: -webkit-box;
 	/*background-color:#F9D;*/
 /*	-webkit-box-orient: horizontal;
@@ -16,12 +27,26 @@ body {
 
 /* individual targets */
 
+.dashboard-notification-module > .enyo-swipeableitem {
+	-webkit-box-flex: 1;
+	position: relative;
+}
+
 .palm-dashboard-icon-container {
 	width: 50px;
 	margin-right: 4px;
 	margin-left: 6px;
-	margin-top: 2px;
+	/* 2px in a 50px window */
+	margin-top: -webkit-calc(50vh - 23px);
+	margin-top: calc(50vh - 23px);
 	position: relative;
+}
+
+/* Apps gave 48px icons (Email's notification-large-generic.png); a larger
+   one was drawn at its own size, over the text. */
+.dashboard-icon {
+	max-width: 48px;
+	max-height: 48px;
 }
 
 .palm-dashboard-text-container {
@@ -37,8 +62,26 @@ body {
 	border: none;
 	overflow: hidden;
 	font-size: 16px;
-	width: 270px;
 	min-height: 53px;
+	height: 100%;
+}
+
+/* From the layer's left edge, less the 7px margin, to the window's right
+   one: a layer clipped to a drag keeps its text laid out at full width, as
+   at 270px, rather than eliding it to what shows. */
+.layer-0 > .palm-dashboard-text-container {
+	width: -webkit-calc(100vw - 53px);
+	width: calc(100vw - 53px);
+}
+
+.layer-1 > .palm-dashboard-text-container {
+	width: -webkit-calc(100vw - 51px);
+	width: calc(100vw - 51px);
+}
+
+.layer-2 > .palm-dashboard-text-container {
+	width: -webkit-calc(100vw - 63px);
+	width: calc(100vw - 63px);
 }
 
 .palm-dashboard-text-container > div {
@@ -51,19 +94,27 @@ body {
 	background:none;
 }
 
-.layer-1 {
+/* Each layer from its left edge to the window's right one, unless the one
+   above clips it to how far that has been dragged (configureClipping). */
+.dashboard-layer {
+	overflow:hidden;
 	position:absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+}
+
+.layer-0 {
+	left:60px;
+}
+
+.layer-1 {
 	left:58px;
 }
 
 .layer-2 {
-	position:absolute;
 	-webkit-transition: left 0.2s ease;
 	left:70px;
-}
-
-.dashboard-layer {
-	overflow:hidden;
 }
 
 
@@ -145,7 +196,7 @@ body {
 	left: -500px; 
 }
 .swipe-shadow.right {
-	left: 320px;
+	left: 100%;
 	width:700px;
 }
 
@@ -162,7 +213,7 @@ body {
 }
 
 .swipe-highlight.right {
-	left:320px;
+	left:100%;
 }
 
 

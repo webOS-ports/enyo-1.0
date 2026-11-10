@@ -214,9 +214,11 @@ enyo.kind({
 		this.inherited(arguments);
 		this.swipeableChanged();
 	},
+	// With no layer above it (dx null), the one under shows all the way to
+	// the right edge, wherever that is: dashboard.css takes each layer there.
 	configureClipping: function(inSender, dx) {
 		if (this.clipControl) {
-			this.clipControl.setStyle("width:"+Math.max(0, dx + this.leftOffset)+"px;"); // clipping div should be 10 greater than drag position, but never < 4.
+			this.clipControl.setStyle(dx === null ? "" : "width:"+Math.max(0, dx + this.leftOffset)+"px;"); // clipping div should be 10 greater than drag position, but never < 4.
 		}
 	},
 	layerChanged: function() {
@@ -224,13 +226,10 @@ enyo.kind({
 			this.show();
 			this.$.title.setContent(this.layer.title);
 			this.$.text.setContent(this.layer.text);
-			if(this.leftOffset) {
-				this.$.swipeable.setStyle("width:"+(270-this.leftOffset)+"px;");
-			}
 			this.configureClipping(this, 0);
 		} else {
 			this.hide();
-			this.configureClipping(this, 270);
+			this.configureClipping(this, null);
 		}
 	},
 	swipeableChanged: function() {
