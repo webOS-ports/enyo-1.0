@@ -61,11 +61,20 @@ browser turns into taps as it does a finger's.
 ## On a device
 
     ./device.sh <adb serial>
+    SSH_OPTS="-o UserKnownHostsFile=..." ./device.sh ssh:root@localhost:5522   # VirtualBox image
 
 installs the test app as `org.webosports.test.caret`, launches it, forwards
 WebAppMgr's DevTools port (9998) and runs the suite. The screen has to be on
 and unlocked. The app loads the device's Enyo, so this tests what is
 installed there.
+
+On a device with a touchscreen the touches are real ones: `inject.py` writes
+them to its evdev node, so they go through the compositor and the browser's
+gesture detection as a finger's do (LuneOS's runtime makes no tap or long
+press of DevTools touches), calibrated against where the page sees them
+land. Nobody should touch the device while it runs. Without a touchscreen
+(the VirtualBox image), or with `DEVTOOLS_TOUCH=1`, DevTools touches are sent
+and the long press and composition checks are left out.
 
     ./device.sh <adb serial> --app            # whatever app is in front
     ./device.sh <adb serial> --app --probe    # ... including email fields

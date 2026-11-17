@@ -11,7 +11,7 @@
 //                     gesture (Input.synthesizeTapGesture)
 //   --no-long-press   skip the long press check, for a browser that does not
 //                     select on a long press (a desktop one)
-//   --inject adb:<serial>
+//   --inject <adb serial> | ssh:[user@]host[:port]
 //                     touch with real touchscreen events on that device
 //                     (inject.py writes them to its evdev node), so that they
 //                     go through the compositor and the browser's gesture
@@ -510,16 +510,23 @@ async function calibrate(cdp, readMove) {
 // against where the page sees them land: in the empty part of the page, below
 // the fields.
 async function injector(top, evalIn) {
-	const m = /^adb:(.+)$/.exec(opt.inject);
-	if (!m) throw new Error("--inject takes adb:<serial>");
 	const {execFileSync} = require("child_process");
-	const adb = (...a) => execFileSync("adb", ["-s", m[1], ...a], {encoding: "utf8"}).trim();
 	const remote = "/home/root/caret-inject.py";
-	adb("push", path.join(__dirname, "inject.py"), remote);
-	const info = adb("shell", "python3 " + remote + " info").split(/\s+/);
+	// device.sh pushes inject.py; the device is an adb serial or ssh:[user@]host[:port].
+	let shell;
+	const ssh = /^ssh:([^:]+)(?::(\d+))?$/.exec(opt.inject);
+	if (ssh) {
+		const extra = (process.env.SSH_OPTS || "").split(/\s+/).filter(Boolean);
+		shell = (cmd) => execFileSync("ssh", ["-o", "BatchMode=yes", "-p", ssh[2] || "22", ...extra, ssh[1], cmd],
+			{encoding: "utf8"}).trim();
+	} else {
+		const serial = opt.inject.replace(/^adb:/, "");
+		shell = (cmd) => execFileSync("adb", ["-s", serial, "shell", cmd], {encoding: "utf8"}).trim();
+	}
+	const info = shell("python3 " + remote + " info").split(/\s+/);
 	const [x0, x1, y0, y1] = info.slice(1).map(Number);
 	console.log(`touchscreen ${info[0]}: x ${x0}..${x1}, y ${y0}..${y1}`);
-	const run = (...a) => adb("shell", "python3 " + remote + " " + a.join(" "));
+	const run = (...a) => shell("python3 " + remote + " " + a.join(" "));
 	await evalIn(top, `(() => { document.activeElement && document.activeElement.blur();
 		window.__caretTouch = null;
 		if (!window.__caretTouchWatch) { window.__caretTouchWatch = true;
