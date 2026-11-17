@@ -28,11 +28,17 @@ enyo.requiresWindow(function() {
 		},
 		touchstart: function(e) {
 			this._send("mousedown", e.changedTouches[0]);
-			// FIXME: Android 3 will not display keyboard if touch event is prevented
-			// note: documentation for android web browser is hard to find.
-			if (e.target && e.target.nodeName != "INPUT") {
+			// The browser makes a tap's own mousedown and click only from a touch
+			// that is not prevented, and it is that mousedown that focuses a text
+			// field and puts the caret where the finger was (or selects, on a long
+			// press). So a touch on a text field - an input, a textarea, or a
+			// RichText, which is contenteditable - is left to the browser.
+			if (e.target && !this.isText(e.target)) {
 				e.preventDefault();
 			}
+		},
+		isText: function(inNode) {
+			return inNode.nodeName == "INPUT" || inNode.nodeName == "TEXTAREA" || Boolean(inNode.isContentEditable);
 		},
 		touchmove: function(e) {
 			this._send("mousemove", e.changedTouches[0]);

@@ -28,8 +28,6 @@ enyo.gesture = {
 //* @protected
 	hysteresis: 4,
 	holdDelay: 200,
-	// how long (ms) to wait for the simulated click sent by focusAtPoint
-	focusingTimeout: 300,
 	pulseInterval: 100,
 	// synthesize 'back' event from ESC key on all platforms
 	keyup: function(e) {
@@ -62,25 +60,7 @@ enyo.gesture = {
 		// FIXME: do we need to ascend the parent tree or is it enough to require an explicit flag on the control?
 		return e.dispatchTarget.requiresDomMousedown;
 	},
-	// True while the simulated click sent by focusAtPoint is expected.
-	// Runtimes that ignore PalmSystem.simulateMouseClick (the LuneOS webruntime
-	// lists it as unhandled) never send that click, so the flag times out
-	// instead of swallowing the user's next tap or drag.
-	isFocusing: function() {
-		if (this._isFocusing && new Date().getTime() - this._isFocusing > this.focusingTimeout) {
-			this._isFocusing = false;
-		}
-		return !!this._isFocusing;
-	},
 	mousedown: function(e) {
-		// FIXME: refactor: code only relevant if using device async focusAtPoint api.
-		if (this.isFocusing()) {
-			// if mousedown target has changed while focusing, abort focus
-			if (e.target != this.targetEvent.target) {
-				e.preventDefault();
-			}
-			return true;
-		}
 		// only process events that haven't been synthesized
 		// (aka have not already been through this function)
 		if (!e.synthetic && e.dispatchTarget) {
@@ -136,11 +116,6 @@ enyo.gesture = {
 		}
 	},
 	mouseup: function(e) {
-		// FIXME: refactor: code only relevant if using device async focusAtPoint api.
-		if (this.isFocusing()) {
-			this._isFocusing = false;
-			return true;
-		}
 		// only process events that haven't been synthesized
 		// (i.e. have not already been through this function)
 		if (!e.synthetic) {
@@ -208,11 +183,6 @@ enyo.gesture = {
 		return (this.target !== e.target);
 	},
 	click: function(e) {
-		// The click the runtime makes for focusAtPoint is not another tap: the
-		// tap's own click is sent with it (by the touch shim, webkitGesture.js).
-		if (this._simulatingClick) {
-			return true;
-		}
 		if (this.didDrag && !e.dispatchTarget.requiresDomClick) {
 			// reset didDrag just in case somebody might send a click directly
 			// and there was no mouseup to set didDrag.
@@ -360,33 +330,19 @@ enyo.gesture = {
 	}
 };
 
-// when on device, implement focus at point system which defers focus until mouseup.
+// On a device, text controls take the browser's own mousedown (BasicInput and
+// BasicRichText ask for it): the browser focuses them and puts the caret where
+// the finger or the pointer was, or selects on a long press, as it does in any
+// page. Other controls have their mousedown prevented and are focused here.
+//
+// webOS deferred this to PalmSystem.simulateMouseClick() at the tapped point,
+// a click the system made after the fact. LuneOS's runtime makes it from page
+// coordinates that miss the page zoom WebAppMgr gives legacy apps and the
+// offset of an iframe (as Accounts shows the Email app's sign-in), so the
+// click landed somewhere else: the caret did not move, or moved, focused or
+// selected in another field. The browser's own mousedown has neither problem.
 enyo.requiresWindow(function() {
 	if (window.PalmSystem) {
-		
-		// FIXME: inform system we are simulating clicks
-		// corrects selection menu positioning
-		// Not currently implemented for Pre3.
-		if(PalmSystem.useSimulatedMouseClicks) {
-			PalmSystem.useSimulatedMouseClicks(true);
-		}
-		//
-		enyo.gesture.focusAtPoint = function(e) {
-			// the time focusing started; see isFocusing
-			enyo.gesture._isFocusing = new Date().getTime();
-			// A runtime that makes the click at once (the LuneOS webruntime) sends
-			// its click event during these calls: it only places the caret, the
-			// tap's click goes out on its own (see click).
-			enyo.gesture._simulatingClick = true;
-			try {
-				// note: these events are asynchronous, but apparently can be called in order.
-				PalmSystem.simulateMouseClick(Math.round(e.pageX), Math.round(e.pageY), true);
-				PalmSystem.simulateMouseClick(Math.round(e.pageX), Math.round(e.pageY), false);
-			} finally {
-				enyo.gesture._simulatingClick = false;
-			}
-		}
-
 		enyo.gesture.requiresDomMousedown = function(e) {
 			// e.detail == 2 means mousedown is part of a doubleclick; require dom mousedown in this case to preserve
 			// device doubleclick select behavior.
@@ -396,15 +352,12 @@ enyo.requiresWindow(function() {
 		enyo.gesture.focusByEvent = function(e) {
 			// FIXME: keyboard will toggle briefly unless it is suspended/resumed bracketing call to focusNode
 			enyo.keyboard.suspend();
-			// FIXME: blur/focus target synchonrously so that change events happen before click.
-			// remove when we have a single synchronous "focusAtPoint" api.
 			// NOTE: some focusing controls like richtext have internal non-focusable nodes.
 			// Focusing these nodes briefly toggles device keyboard, so instead focus control node
 			// if control says so via requiresNodeFocus property
 			var c = e.dispatchTarget;
 			this.focusNode(c.requiresNodeFocus ? c.hasNode() : e.target);
 			enyo.keyboard.resume();
-			this.focusAtPoint(e);
 		}
 	}
 });

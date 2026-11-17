@@ -21,7 +21,8 @@ enyo.kind({
 	disabledClassName: "enyo-richtext-disabled",
 	//* @protected
 	nodeTag: "div",
-	// NOTE: only required in browser, overridden below
+	// The browser's own mousedown focuses the field and puts the caret where
+	// the finger or pointer was, on a device as in a browser (see Gesture.js).
 	requiresDomMousedown: true,
 	requiresNodeFocus: true,
 	create: function() {
@@ -151,9 +152,3 @@ enyo.kind({
 	}
 });
 
-// on devices with focusAtPoint api, do not need special mousedown handling.
-enyo.requiresWindow(function() {
-	if (window.PalmSystem) {
-		enyo.BasicRichText.prototype.requiresDomMousedown = false;
-	}
-});
