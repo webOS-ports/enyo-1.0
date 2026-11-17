@@ -128,6 +128,14 @@ window.__caret = {
 		const el = this.el(name);
 		return el ? textOf(el) : null;
 	},
+	// The field as it looks: Enyo draws its frame on a wrapper round the
+	// editable element (.enyo-input), which is twice as tall as the text.
+	box(name) {
+		const el = this.el(name);
+		const b = el.closest(".enyo-input") || el;
+		const r = b.getBoundingClientRect();
+		return {top: r.top, bottom: r.bottom, left: r.left, right: r.right};
+	},
 	// A point to tap for the caret to land at index k: a third of the way into
 	// character k (nearer its left edge), or just past the end for the end.
 	point(name, k) {
@@ -269,6 +277,15 @@ async function main() {
 		const o = await frameOffset(field);
 		return {x: p.x + o.x, y: p.y + o.y};
 	};
+	// The same place along the text, but near the top or the bottom edge of
+	// the field as it is drawn rather than on the letters.
+	const EDGE_PX = 4;
+	const edgePointFor = async (field, k, edge) => {
+		const p = await pointFor(field, k);
+		const b = await call(field.frame, "box", field.name);
+		const o = await frameOffset(field);
+		return {x: p.x, y: (edge === "top" ? b.top + EDGE_PX : b.bottom - EDGE_PX) + o.y};
+	};
 
 	const input = makeInput(cdp, toInput, opt.inject ? await injector(top, evalIn) : null);
 	const results = [];
@@ -349,6 +366,44 @@ async function main() {
 		await input.tap(await pointFor(field, n));
 		await sleep(SETTLE_MS);
 		expect(`${F}: a tap past the end`, await caretAt(field), [n, n]);
+
+		// The whole field takes the finger, not only the letters: Enyo's field
+		// is twice as tall as its text.
+		await input.tap(await edgePointFor(field, k1, "top"));
+		await sleep(SETTLE_MS);
+		expect(`${F}: a tap at the top of the field, above the letters`, await caretAt(field), [k1, k1]);
+
+		await input.tap(await edgePointFor(field, 2, "bottom"));
+		await sleep(SETTLE_MS);
+		expect(`${F}: a tap at the bottom of the field, below the letters`, await caretAt(field), [2, 2]);
+
+		// A finger slid through the text takes the caret with it (Chromium's
+		// SwipeToMoveCursor), from anywhere in the field's height. Where the
+		// runtime does not do that at all, there is nothing to check.
+		{
+			const kFrom = 2, kTo = Math.min(n - 2, kFrom + 8);
+			const from = await pointFor(field, kFrom), to = await pointFor(field, kTo);
+			await input.tap(from);
+			await sleep(SETTLE_MS);
+			await input.slide(from, to.x - from.x);
+			await sleep(SETTLE_MS);
+			const onLetters = await caretAt(field);
+			if (!onLetters.at || onLetters.at[0] !== onLetters.at[1] || onLetters.at[0] === kFrom) {
+				console.log(`info ${F}: a slide along the letters leaves ${show(onLetters)}: the runtime does not move the caret with a finger`);
+			} else {
+				check(`${F}: a slide along the letters takes the caret along`, Math.abs(onLetters.at[0] - kTo) <= 1,
+					`want caret ${kTo} (give or take one), got ${show(onLetters)}`);
+				await input.tap(from);
+				await sleep(SETTLE_MS);
+				const edgeFrom = await edgePointFor(field, kFrom, "top");
+				await input.slide(edgeFrom, to.x - from.x);
+				await sleep(SETTLE_MS);
+				const fromEdge = await caretAt(field);
+				check(`${F}: ... and so does one along the top of the field, above them`,
+					fromEdge.at && fromEdge.at[0] === fromEdge.at[1] && Math.abs(fromEdge.at[0] - onLetters.at[0]) <= 1,
+					`want caret ${onLetters.at[0]} (give or take one), got ${show(fromEdge)}`);
+			}
+		}
 
 		await input.click(await pointFor(field, k3));
 		await sleep(SETTLE_MS);
@@ -556,6 +611,10 @@ async function injector(top, evalIn) {
 		async drag(q, dy) {
 			const p = raw(q);
 			run("drag", p.x, p.y, 0, Math.round(dy * ky), 12);
+		},
+		async slide(q, dx) {
+			const p = raw(q);
+			run("drag", p.x, p.y, Math.round(dx * kx), 0, 30);
 		}
 	};
 }
@@ -584,6 +643,15 @@ function makeInput(cdp, toInput, inj) {
 			const p = at(q);
 			if (opt.touch === "events") return touchEvents([round(p)], LONG_PRESS_MS);
 			await cdp.send("Input.synthesizeTapGesture", {...round(p), duration: LONG_PRESS_MS, tapCount: 1, gestureSourceType: "touch"});
+		},
+		// A slow sideways slide, as a finger moving the caret along makes.
+		async slide(q, dx) {
+			if (inj) return inj.slide(q, dx);
+			const p = toInput(q);
+			dx = dx * (toInput({x: 100, y: 0}).x - toInput({x: 0, y: 0}).x) / 100;
+			const pts = [];
+			for (let i = 0; i <= 20; i++) pts.push(round({x: p.x + dx * i / 20, y: p.y}));
+			return touchEvents(pts, 30);
 		},
 		async drag(q, dy) {
 			if (inj) return inj.drag(q, dy);
