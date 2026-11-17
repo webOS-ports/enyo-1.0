@@ -1,0 +1,11 @@
+{
+    "id": "org.webosports.test.caret",
+    "title": "Caret Test",
+    "version": "1.0.0",
+    "vendor": "LuneOS",
+    "type": "web",
+    "main": "index.html",
+    "icon": "icon.png",
+    "uiRevision": 2,
+    "removable": true
+}
