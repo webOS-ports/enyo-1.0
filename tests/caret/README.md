@@ -19,6 +19,13 @@ For each field it checks, as the user sees it:
 
 - a tap focuses the field and puts the caret where the finger was: unfocused,
   focused, near the start, past the end;
+- a tap at the top or the bottom of the field, above or below its letters,
+  puts the caret on the line where the finger was along it: the whole field
+  is the target, not only its letters;
+- a finger slid along the letters, and one slid along the top of the field
+  above them, takes the caret with it (Chromium's swipe to move the cursor,
+  `--enable-features=SwipeToMoveCursor`; a runtime without it is reported as
+  `info`);
 - a pointer click (a mouse, the Q25's pointer) puts the caret there;
 - the arrow keys move it from there and Shift+arrows select from it (what
   kbdscroll sends);

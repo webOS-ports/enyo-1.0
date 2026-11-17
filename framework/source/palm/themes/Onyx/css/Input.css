@@ -18,8 +18,22 @@
 	}
 }
 
+/*
+ * The text field is the whole field, not only its letters: the frame is a
+ * 14px border on the wrapper, and the input inside it was only as tall as
+ * the text, so a finger above or below the letters - half the field - was on
+ * the wrapper. A tap there sent the caret to the end of the text, and a
+ * finger slid along there scrolled instead of taking the caret with it.
+ * So the input reaches out over the frame's top and bottom, and pads
+ * itself back in by as much: the text stays where it was (2px up, as
+ * before), and the frame still shows through the input's transparent
+ * background. Heritage did the same with its -14px margin.
+ * In a group, .enyo-first and .enyo-last swap a side's 14px border for 2px
+ * of border and 12px of padding, which is the same 14px to reach over.
+ */
 .enyo-input > .enyo-input-spacing {
-	margin: -2px -4px;
+	margin: -14px -4px;
+	padding: 12px 0;
 }
 
 .enyo-input-input {
