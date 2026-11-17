@@ -34,6 +34,13 @@
 	padding: 2px 0 1px 0;
 }
 
+/* Over the 6px frame, as Input.css does over the 14px one: 5px more
+   padding each way and 5px further out, so the text stays where it was. */
+.enyo-input.enyo-tool-input > .enyo-input-spacing.enyo-input-input {
+	margin: -6px -1px;
+	padding: 7px 0 6px 0;
+}
+
 .enyo-input.enyo-tool-input .enyo-input-input:focus, .enyo-input.enyo-tool-input.enyo-input-focus .enyo-input-input {
 	color: #000;
 }
