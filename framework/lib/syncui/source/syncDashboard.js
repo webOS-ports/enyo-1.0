@@ -119,7 +119,7 @@ enyo.kind({
 					console.log("Removing dashboard " + syncAccount.dashboardStatus + " for account " + accountId)
 					// If a sync or delete has finished then display a "sync/delete done" banner
 					if (syncAccount.bannerEndText) {
-						enyo.windows.addBannerMessage(syncAccount.bannerEndText, "{}", syncAccount.dashboard.smallIcon);
+						enyo.windows.addBannerMessage(((syncAccount.account && (syncAccount.account.alias || syncAccount.account.username)) ? ((syncAccount.account.alias || syncAccount.account.username) + ": ") : "") + syncAccount.bannerEndText, "{}", syncAccount.dashboard.smallIcon);
 						delete syncAccount.bannerEndText;
 					}
 					syncAccount.dashboard.destroy();
@@ -181,7 +181,7 @@ enyo.kind({
 
 			// Display a banner
 			if (syncAccount.status === "INITIAL_SYNC" || syncAccount.status === "DELETE") {
-				enyo.windows.addBannerMessage(text, "{}", icon);
+				enyo.windows.addBannerMessage(((syncAccount.account && (syncAccount.account.alias || syncAccount.account.username)) ? ((syncAccount.account.alias || syncAccount.account.username) + ": ") : "") + text, "{}", icon);
 				// Be slow to take the dashboard down
 				this.watchDelay = 3000;
 
