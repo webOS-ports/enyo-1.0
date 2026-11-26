@@ -58,11 +58,18 @@ enyo.kind({
 		this.sendEventToApp("doLayerSwipe", [layer]);
 		// After updating layers, we may need to animate the uncovered one into place.
 		// Pull layer-2 back to layer-1's position, and when it's real class is restored it will animate.
+		// LuneOS: swap the one class, not the whole className. That took
+		// "dashboard-layer" with it, which is what positions a layer
+		// (dashboard.css), so the top layer fell back into the row as a plain
+		// flex item, and the clipped layers under it, still positioned, were
+		// drawn over the start of its text.
 		if(this.layers.length > 2) {
 			var that=this;
-			this.$.layer2.setClassName("layer-1");
+			this.$.layer2.removeClass("layer-2");
+			this.$.layer2.addClass("layer-1");
 			window.setTimeout(function() {
-				that.$.layer2.setClassName("layer-2");
+				that.$.layer2.removeClass("layer-1");
+				that.$.layer2.addClass("layer-2");
 			}, 0);
 		}
 	},
